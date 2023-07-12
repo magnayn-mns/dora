@@ -1,0 +1,13 @@
+query GetTeamMembers($team: String!, $org: String!) {
+  organization(login: $org) {
+    team(slug: $team) {
+      members {
+        edges {
+          node {
+            login
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,37 @@
+query GetMergedPrs($last: Int!, $searchQuery: String!, $after: String) {
+  search(query: $searchQuery, type: ISSUE, last: $last, after: $after) {
+    pageInfo {
+      startCursor
+      hasNextPage
+      endCursor
+    }
+    edges {
+      node {
+        __typename
+        ... on PullRequest {
+          author {
+            login
+          }
+          number
+          url
+          title
+          baseRef {
+            name
+          }
+          mergedAt
+          createdAt
+          commits(first: 1) {
+            edges {
+              node {
+                commit {
+                  committedDate
+                  oid
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

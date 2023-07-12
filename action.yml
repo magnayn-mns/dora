@@ -1,0 +1,20 @@
+name: 'Do Dora'
+author: 'nigel.magnay@nirima.com'
+description: 'Do some Dora'
+branding:
+  icon: 'info'
+  color: 'green'
+inputs:
+  token:
+    description: github token
+    required: true
+  newrelic_apikey:
+    description: New Relic Api Key token
+    required: true
+
+runs:
+  using: 'docker'
+  image: 'docker://ghcr.io/magnayn-mns/dora:main'
+  args:
+    - ${{ inputs.token }}
+    - ${{ inputs.newrelic_apikey }}

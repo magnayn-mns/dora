@@ -1,0 +1,4647 @@
+swagger: '2.0'
+info:
+  title: api.newrelic.com
+  version: v2
+host: api.newrelic.com
+basePath: /v2/
+schemes:
+  - https
+
+securityDefinitions:
+  # X-Api-Key: abcdef12345
+  APIKeyHeader:
+    type: apiKey
+    in: header
+    name: X-Api-Key
+security:
+  - APIKeyHeader: []     # use the same name as under securityDefinitions
+
+paths:
+  /alerts_channels.json:
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Pagination index
+          in: query
+          name: page
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/ChannelResponse'
+          headers:
+            link:
+              type: array
+              items:
+                type: string
+              collectionFormat: "csv"
+              description: |
+                Links to related resources, in the format defined by [RFC 5988](https://tools.ietf.org/html/rfc5988#section-5). This will include a link with relation type `next` to the next page and `last` to the last page, unless this page is itself the last page.
+      description: |
+        <p>This API endpoint works with new Alerts on alerts.newrelic.com.</p>
+
+        <p>It returns a list of the channels associated with your New Relic account.</p>
+
+        <p>Note: See our documentation for a discussion on <a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/rest-api-calls-new-relic-alerts#channels-list">listing notification channels</a>.</p>
+      summary: List
+    post:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: channel schema
+          in: body
+          name: channel
+          required: true
+          schema:
+            $ref: '#/definitions/Channel'
+        - description: Policy IDs to associate with channel
+          in: query
+          items:
+            type: string
+          name: policy_ids
+          required: false
+          type: array
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/ChannelResponse'
+      description: |+
+        <p>This API endpoint works with new Alerts on alerts.newrelic.com.</p>
+
+        <p>It creates a channel associated with your New Relic account.</p>
+
+        <p>Note: <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/rest-api-key">Admin User’s API Key</a> is required.</p>
+
+        <p>See our documentation for a discussion on <a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/rest-api-calls-new-relic-alerts#channels-create">creating notification channels</a>.</p>
+
+        <p>Channel type configuration options:</p>
+
+        <ul>
+          <li>
+            <p>Email</p>
+
+            <p>{</p>
+
+            <pre><code>"recipients" : "test@google.com",
+        "include_json_attachment" : true
+        </code></pre>
+
+            <p>}</p>
+          </li>
+          <li>
+            <p>HipChat</p>
+
+            <p>{</p>
+
+            <pre><code>"auth_token": "abc123",
+        "room_id": "google.com"
+        </code></pre>
+
+            <p>}</p>
+          </li>
+          <li>
+            <p>OpsGenie</p>
+
+            <p>{</p>
+
+            <pre><code>"api_key": "abc123",
+        "teams": "team1",
+        "tags": "tag1",
+        "recipients": "me@me.com"
+        </code></pre>
+
+            <p>}</p>
+          </li>
+          <li>
+            <p>Slack</p>
+
+            <p>{</p>
+
+            <pre><code>"url": "http://test.com",
+        "channel": "channel1"
+        </code></pre>
+
+            <p>}</p>
+          </li>
+          <li>
+            <p>Campfire</p>
+
+            <p>{</p>
+
+            <pre><code>"subdomain": "mysubdomain",
+        "token": "123abc",
+        "room": "room1"
+        </code></pre>
+
+            <p>}</p>
+          </li>
+          <li>
+            <p>Victorops</p>
+
+            <p>{</p>
+
+            <pre><code>"key": "mykey",
+        "route_key": "theroute"
+        </code></pre>
+
+            <p>}</p>
+          </li>
+          <li>
+            <p>PagerDuty</p>
+
+            <p>{</p>
+
+            <pre><code>"service_key": "myservicekey"
+        </code></pre>
+
+            <p>}</p>
+          </li>
+          <li>
+            <p>Webhook (json)</p>
+
+            <p>{</p>
+
+            <pre><code>"base_url": "http://test.com",
+        "auth_username": "username",
+        "auth_password": "password",
+        "payload_type": "application/json",
+        "payload": {
+          "account_id": "$ACCOUNT_ID",
+          "account_name": "$ACCOUNT_NAME",
+          "condition_id": "$CONDITION_ID",
+          "condition_name": "$CONDITION_NAME",
+          "current_state": "$EVENT_STATE",
+          "details": "$EVENT_DETAILS",
+          "event_type": "$EVENT_TYPE",
+          "incident_acknowledge_url": "$INCIDENT_ACKNOWLEDGE_URL",
+          "incident_id": "$INCIDENT_ID",
+          "incident_url": "$INCIDENT_URL",
+          "owner": "$EVENT_OWNER",
+          "policy_name": "$POLICY_NAME",
+          "policy_url": "$POLICY_URL",
+          "runbook_url": "$RUNBOOK_URL",
+          "severity": "$SEVERITY",
+          "targets": "$TARGETS",
+          "timestamp": "$TIMESTAMP",
+          "violation_chart_url": "$VIOLATION_CHART_URL"
+        },
+        "headers": {"header1": "test", "header2": "test"}
+        </code></pre>
+
+            <p>}</p>
+          </li>
+          <li>
+            <p>Webhook (x-www-form-urlencoded)</p>
+
+            <p>{</p>
+
+            <pre><code>"base_url": "http://test.com",
+        "auth_username": "username",
+        "auth_password": "password",
+        "payload_type": "application/x-www-form-urlencoded",
+        "payload": {
+          "account_id": "$ACCOUNT_ID",
+          "account_name": "$ACCOUNT_NAME",
+          "condition_id": "$CONDITION_ID",
+          "condition_name": "$CONDITION_NAME",
+          "current_state": "$EVENT_STATE",
+          "details": "$EVENT_DETAILS",
+          "event_type": "$EVENT_TYPE",
+          "incident_acknowledge_url": "$INCIDENT_ACKNOWLEDGE_URL",
+          "incident_id": "$INCIDENT_ID",
+          "incident_url": "$INCIDENT_URL",
+          "owner": "$EVENT_OWNER",
+          "policy_name": "$POLICY_NAME",
+          "policy_url": "$POLICY_URL",
+          "runbook_url": "$RUNBOOK_URL",
+          "severity": "$SEVERITY",
+          "targets": "$TARGETS",
+          "timestamp": "$TIMESTAMP",
+          "violation_chart_url": "$VIOLATION_CHART_URL"
+        },
+        "headers": {"header1": "test", "header2": "test"}
+        </code></pre>
+
+            <p>}</p>
+          </li>
+        </ul>
+
+      summary: Create
+  '/alerts_channels/{channel_id}.json':
+    delete:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Channel ID
+          in: path
+          name: channel_id
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/ChannelResponse'
+      description: |+
+        <p>This API endpoint deletes Alerts notification channels.</p>
+
+        <p>Note: <code>User</code> notification channels cannot be deleted.</p>
+
+        <p>Note: <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/rest-api-key">Admin User’s API Key</a> is required.</p>
+
+        <p>See our documentation for a discussion on <a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/rest-api-calls-new-relic-alerts#channels-delete">deleting notification channels</a>.</p>
+
+      summary: Delete
+  /alerts_conditions.json:
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Alerts policy ID
+          in: query
+          name: policy_id
+          required: true
+          type: integer
+        - description: Pagination index
+          in: query
+          name: page
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/ConditionResponse'
+          headers:
+            link:
+              type: array
+              items:
+                type: string
+              collectionFormat: "csv"
+              description: |
+                Links to related resources, in the format defined by [RFC 5988](https://tools.ietf.org/html/rfc5988#section-5). This will include a link with relation type `next` to the next page and `last` to the last page, unless this page is itself the last page.
+      description: |
+        <p>This API endpoint allows you to list APM Application and Key Transaction, Browser and Mobile application metric conditions for your alert policies.</p>
+
+        <p>Note: <strong>Conditions for web transaction percentiles, or conditions targeting labels (dynamic targeting), are not available.</strong></p>
+
+        <p>See our documentation for a discussion on <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/pagination-api-output" target="_blank">
+        output pagination</a>.</p>
+      summary: List
+  '/alerts_conditions/policies/{policy_id}.json':
+    post:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Alerts policy ID
+          in: path
+          name: policy_id
+          required: true
+          type: integer
+        - description: Condition schema
+          in: body
+          name: condition
+          required: true
+          schema:
+            $ref: '#/definitions/Condition'
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/ConditionResponse'
+      description: "<p>This API endpoint allows you to create APM Application and Key Transaction, Browser and Mobile application metric conditions for your alert policies.</p>\n\n<p><strong>Conditions for web transaction percentiles, or conditions targeting labels (dynamic targeting), are not available.</strong></p>\n\n<p>Note: <a href=\"https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/rest-api-key\">Admin User’s API Key</a> is required.</p>\n\n<p>See our documentation for a discussion on <a href=\"https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/rest-api-calls-new-relic-alerts#conditions-create\" target=\"_blank\">creating conditions for policies</a>.\n<br /></p>\n\n<p>All fields are required except for “runbook_url”, “enabled” (defaults to false), “user_defined”.</p>\n\n<p><a href=\"https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#type\" target=\"_blank\">type</a>: apm_app_metric, apm_kt_metric, servers_metric, browser_metric, mobile_metric.</p>\n\n<p><a href=\"https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#name\" target=\"_blank\">name</a>: A title for your condition.</p>\n\n<p><a href=\"https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#enabled\" target=\"_blank\">enabled</a>: The status of your condition (optional).</p>\n\n<p><a href=\"https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#entities\" target=\"_blank\">entities</a>: An array of instance IDs associated with your condition.</p>\n\n<p><a href=\"https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#metric\" target=\"_blank\">metric</a>: The metric field accepts parameters based on the condition <b>type</b> selected as follows:</p>\n\n<p>\_\_When <b>apm_app_metric</b>: apdex, error_percentage, response_time_web, response_time_background, throughput_web, throughput_background, user_defined.</p>\n\n<p>\_\_When <b>apm_kt_metric</b>: apdex, error_percentage, error_count, response_time, throughput.</p>\n\n<p>\_\_When <b>servers_metric</b>: cpu_percentage, disk_io_percentage, memory_percentage, fullest_disk_percentage, load_average_one_minute, user_defined.</p>\n\n<p>\_\_When <b>browser_metric</b>: end_user_apdex, total_page_load, page_rendering, web_application, network, dom_processing, request_queuing, ajax_response_time, page_views_with_js_errors, page_view_throughput, ajax_throughput, user_defined.</p>\n\n<p>\_\_When <b>mobile_metric</b>: database, images, json, network, view_loading, network_error_percentage, status_error_percentage, mobile_crash_rate, user_defined.</p>\n\n<p><a href=\"https://docs.newrelic.com/docs/alerts/rest-api-alerts/new-relic-alerts-rest-api/alerts-conditions-api-field-names#condition-scope\">condition_scope</a>: Set to either <code>instance</code> to target a Java application instance or <code>application</code> for a Java app.</p>\n\n<p><a href=\"https://docs.newrelic.com/docs/alerts/rest-api-alerts/new-relic-alerts-rest-api/alerts-conditions-api-field-names#violation_close_timer\">violation_close_timer</a> (in hours): 1, 2, 4, 8, 12, 24. Duration after which instance-based (including JVM health metric) violations will automatically close.</p>\n\n<p><a href=\"https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#runbook_url\" target=\"_blank\">runbook_url</a>: Runbook URL to display in notifications (optional).</p>\n\n<p><a href=\"https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#terms_duration\" target=\"_blank\">terms[duration]</a> (in minutes): 5, 10, 15, 30, 60, 120.</p>\n\n<p><a href=\"https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#terms_operator\" target=\"_blank\">terms[operator]</a>: above, below, equal.</p>\n\n<p><a href=\"https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#terms_priority\" target=\"_blank\">terms[priority]</a>: critical, warning.</p>\n\n<p><a href=\"https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#terms_threshold\" target=\"_blank\">terms[threshold]</a>: Must be 0 or greater.</p>\n\n<p><a href=\"https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#terms_time_function\" target=\"_blank\">terms[time_function]</a>: all, any.</p>\n\n<p><a href=\"https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#user_defined_metric\" target=\"_blank\">user_defined[metric]</a>: A custom metric to be evaluated.</p>\n\n<p><a href=\"https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#user_defined_value_function\" target=\"_blank\">user_defined[value_function]</a>: average, min, max, total, sample_size.</p>\n\n"
+      summary: Create
+  '/alerts_conditions/{condition_id}.json':
+    delete:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Alerts condition ID
+          in: path
+          name: condition_id
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/ConditionResponse'
+      description: |
+        <p>This API endpoint allows you to delete APM Application and Key Transaction, Browser and Mobile application metric conditions for your alert policies.</p>
+
+        <p><strong>Conditions for web transaction percentiles, or conditions targeting labels (dynamic targeting), are not available.</strong></p>
+
+        <p>Note: <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/rest-api-key">Admin User’s API Key</a> is required.</p>
+
+        <p>See our documentation for a discussion on <a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/rest-api-calls-new-relic-alerts#conditions-delete" target="_blank">deleting conditions</a>.</p>
+      summary: Delete
+    put:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Alerts condition ID to update
+          in: path
+          name: condition_id
+          required: true
+          type: integer
+        - description: Condition schema
+          in: body
+          name: condition
+          required: true
+          schema:
+            $ref: '#/definitions/Condition'
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/ConditionResponse'
+      description: |+
+        <p>This API endpoint allows you to update APM Application and Key Transaction, Browser and Mobile application metric conditions for your alert policies.</p>
+
+        <p><strong>Conditions for web transaction percentiles, or conditions targeting labels (dynamic targeting), are not available.</strong></p>
+
+        <p>Note: <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/rest-api-key">Admin User’s API Key</a> is required.</p>
+
+        <p>See Alerts Conditions &gt; Create for an explanation of the field values or the online
+        documentation on <a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/rest-api-calls-new-relic-alerts#conditions-update" target="_blank">updating conditions for policies</a>.</p>
+
+      summary: Update
+  '/alerts_entity_conditions/{entity_id}.json':
+    delete:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Entity id to remove
+          in: path
+          name: entity_id
+          required: true
+          type: integer
+        - description: Entity Type
+          in: query
+          name: entity_type
+          required: true
+          type: string
+        - description: Alerts condition ID
+          in: query
+          name: condition_id
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/ConditionResponse'
+      description: |
+        <p>This API endpoint allows you to disassociate an entity with a specified Alerts condition.</p>
+
+        <p>Note: <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/rest-api-key">Admin User’s API Key</a> is required.</p>
+
+        <p>Entity type options (Synthetics is not yet supported):</p>
+
+        <pre><code>BrowserApplication
+
+        Application
+
+        MobileApplication
+
+        Server
+
+        KeyTransaction
+
+        Plugin
+        </code></pre>
+      summary: Remove
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Entity ID
+          in: path
+          name: entity_id
+          required: true
+          type: integer
+        - description: Entity Type
+          in: query
+          name: entity_type
+          required: true
+          type: string
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/ConditionResponse'
+      description: |
+        <p>This API endpoint allows you to list the Alerts conditions an entity is part of.</p>
+
+        <p>Entity type options (Synthetics is not yet supported):</p>
+
+        <pre><code>BrowserApplication
+
+        Application
+
+        MobileApplication
+
+        Server
+
+        KeyTransaction
+
+        Plugin
+        </code></pre>
+      summary: List
+    put:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Entity id to add
+          in: path
+          name: entity_id
+          required: true
+          type: integer
+        - description: Entity Type
+          in: query
+          name: entity_type
+          required: true
+          type: string
+        - description: Alerts condition ID
+          in: query
+          name: condition_id
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/ConditionResponse'
+      description: |
+        <p>This API endpoint allows you to add an entity to a specified Alerts condition.</p>
+
+        <p>Note: <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/rest-api-key">Admin User’s API Key</a> is required.
+        <br />
+          Entity type options (Synthetics is not yet supported):</p>
+
+        <pre><code>BrowserApplication
+
+        Application
+
+        MobileApplication
+
+        Server
+
+        KeyTransaction
+
+        Plugin
+        </code></pre>
+      summary: Add
+  /alerts_events.json:
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Filter by New Relic product
+          in: query
+          name: 'filter[product]'
+          required: false
+          type: string
+        - description: Filter by entity type
+          in: query
+          name: 'filter[entity_type]'
+          required: false
+          type: string
+        - description: Filter by entity group ID
+          in: query
+          name: 'filter[entity_group_id]'
+          required: false
+          type: integer
+        - description: Filter by entity ID
+          in: query
+          name: 'filter[entity_id]'
+          required: false
+          type: integer
+        - description: Filter by event type
+          in: query
+          name: 'filter[event_type]'
+          required: false
+          type: string
+        - description: Filter by incident id
+          in: query
+          name: 'filter[incident_id]'
+          required: false
+          type: integer
+        - description: Pagination index
+          in: query
+          name: page
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/RecentEventResponse'
+          headers:
+            link:
+              type: array
+              items:
+                type: string
+              collectionFormat: "csv"
+              description: |
+                Links to related resources, in the format defined by [RFC 5988](https://tools.ietf.org/html/rfc5988#section-5). This will include a link with relation type `next` to the next page and `last` to the last page, unless this page is itself the last page.
+      description: |
+        <p>This API endpoint allows you to list the alert events for your account.</p>
+
+        <p>Alerts events can be filter by product, target type, group ID, instance ID, and event type.</p>
+
+        <p>The options for products are: <b>APM</b>, <b>BROWSER</b>, <b>MOBILE</b>, <b>SERVERS</b>, <b>PLUGINS</b>, <b>SYNTHETICS</b>, and <b>ALERTS</b>.</p>
+
+        <p>The options for entity type are: <b>Application</b>, <b>Server</b>, <b>KeyTransaction</b>, <b>Plugin</b>, <b>MobileApplication</b>, <b>BrowserApplication</b>, and <b>Monitor</b>.</p>
+
+        <p>The options for event type are: <b>NOTIFICATION</b>, <b>DEPLOYMENT</b>, <b>VIOLATION_OPEN</b>, <b>VIOLATION_CLOSE</b>, <b>VIOLATION</b>, and <b>INSTRUMENTATION</b>.</p>
+
+        <p>The group ID option is normally the same as the entity ID (e.g. an Application group ID and entity ID will be the same), however PLUGINS have a group ID representing the PLUGIN itself, and entity IDs for all instances of that PLUGIN type.</p>
+
+        <p>See our documentation for a discussion on <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/pagination-api-output" target="_blank">
+        output pagination</a>.</p>
+      summary: List
+  /alerts_external_service_conditions.json:
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Alerts policy ID
+          in: query
+          name: policy_id
+          required: true
+          type: integer
+        - description: Pagination index
+          in: query
+          name: page
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/ExternalServiceConditionResponse'
+          headers:
+            link:
+              type: array
+              items:
+                type: string
+              collectionFormat: "csv"
+              description: |
+                Links to related resources, in the format defined by [RFC 5988](https://tools.ietf.org/html/rfc5988#section-5). This will include a link with relation type `next` to the next page and `last` to the last page, unless this page is itself the last page.
+      description: |
+        <p>This API endpoint allows you to list the external service conditions for your alert policy.</p>
+
+        <p>See our documentation for a discussion on
+        <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/pagination-api-output" target="_blank"> output pagination</a>.</p>
+      summary: List
+  '/alerts_external_service_conditions/policies/{policy_id}.json':
+    post:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Alerts policy ID
+          in: path
+          name: policy_id
+          required: true
+          type: integer
+        - description: Condition schema
+          in: body
+          name: external_service_condition
+          required: true
+          schema:
+            $ref: '#/definitions/ExternalServiceCondition'
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/ExternalServiceConditionResponse'
+      description: "<p>This API endpoint allows you to create external service conditions for your alert policies.</p>\n\n<p>Note: <a href=\"https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/rest-api-key\">Admin User’s API Key</a> is required.</p>\n\n<p>See our documentation for a discussion on <a href=\"https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/rest-api-calls-new-relic-alerts#ext-conditions-create\" target=\"_blank\">creating conditions for external services</a>.</p>\n\n<p>All fields are required except for “runbook_url”, “enabled” (defaults to false).</p>\n\n<p><a href=\"https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#type\" target=\"_blank\">type</a>: apm_external_service, mobile_external_service.</p>\n\n<p><a href=\"https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#name\" target=\"_blank\">name</a>: A title for your condition.</p>\n\n<p><a href=\"https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#enabled\" target=\"_blank\">enabled</a>: The status of your condition (optional).</p>\n\n<p><a href=\"https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#entities\" target=\"_blank\">entities</a>: An array of instance IDs associated with your condition.</p>\n\n<p><a href=\"https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#external_service_url\" target=\"_blank\">external_service_url</a>: The URL of the external service. Must not include protocol (“example.com”, not “https://example.com”)</p>\n\n<p><a href=\"https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#metric\" target=\"_blank\">metric</a>: The metric field accepts parameters based on the condition <b>type</b> selected as follows:</p>\n\n<p>\_\_When <b>apm_external_service</b>: response_time_average, response_time_minimum, response_time_maximum, throughput.</p>\n\n<p>\_\_When <b>mobile_external_service</b>: response_time_average, response_time_minimum, response_time_maximum, throughput, network_failure_percentage, http_status_error_percentage.</p>\n\n<p><a href=\"https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#runbook_url\" target=\"_blank\">runbook_url</a>: Runbook URL to display in notifications (optional).</p>\n\n<p><a href=\"https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#terms_duration\" target=\"_blank\">terms[duration]</a> (in minutes): 5, 10, 15, 30, 60, 120.</p>\n\n<p><a href=\"https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#terms_operator\" target=\"_blank\">terms[operator]</a>: above, below, equal.</p>\n\n<p><a href=\"https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#terms_priority\" target=\"_blank\">terms[priority]</a>: critical, warning.</p>\n\n<p><a href=\"https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#terms_threshold\" target=\"_blank\">terms[threshold]</a>: Must be 0 or greater.</p>\n\n<p><a href=\"https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#terms_time_function\" target=\"_blank\">terms[time_function]</a>: all, any.</p>\n\n"
+      summary: Create
+  '/alerts_external_service_conditions/{condition_id}.json':
+    delete:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Alerts condition ID
+          in: path
+          name: condition_id
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/ExternalServiceConditionResponse'
+      description: |+
+        <p>This API endpoint allows you to delete external service conditions associated with your alert policy.</p>
+
+        <p>Note: <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/rest-api-key">Admin User’s API Key</a> is required.</p>
+
+        <p>See our documentation for a discussion on <a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/rest-api-calls-new-relic-alerts#ext-conditions-delete" target="_blank">deleting External services conditions</a>.</p>
+
+      summary: Delete
+    put:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Alerts condition ID to update
+          in: path
+          name: condition_id
+          required: true
+          type: integer
+        - description: Condition schema
+          in: body
+          name: external_service_condition
+          required: true
+          schema:
+            $ref: '#/definitions/ExternalServiceCondition'
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/ExternalServiceConditionResponse'
+      description: |
+        <p>This API endpoint allows you to update external service conditions for your alert policies.</p>
+
+        <p>Note: <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/rest-api-key">Admin User’s API Key</a> is required.</p>
+
+        <p>See Alerts External Service Conditions &gt; Create for an explanation of the field values used in this command or the online documentation on
+        <a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/rest-api-calls-new-relic-alerts#ext-conditions-update" target="_blank">updating conditions for external services</a>.</p>
+      summary: Update
+  /alerts_incidents.json:
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Pagination index
+          in: query
+          name: page
+          required: false
+          type: integer
+        - description: Filter by open incidents
+          in: query
+          name: only_open
+          required: false
+          type: boolean
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/IncidentResponse'
+          headers:
+            link:
+              type: array
+              items:
+                type: string
+              collectionFormat: "csv"
+              description: |
+                Links to related resources, in the format defined by [RFC 5988](https://tools.ietf.org/html/rfc5988#section-5). This will include a link with relation type `next` to the next page and `last` to the last page, unless this page is itself the last page.
+      description: |
+        <p>This API endpoint returns a list of the Incidents associated with your New Relic account.</p>
+
+        <p>See our documentation for a discussion on <a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/rest-api-calls-new-relic-alerts#incidents" target="_blank">listing incidents</a>
+        and <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/pagination-api-output" target="_blank">output pagination</a>.</p>
+      summary: List
+  /alerts_nrql_conditions.json:
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Alerts policy ID
+          in: query
+          name: policy_id
+          required: true
+          type: integer
+        - description: Pagination index
+          in: query
+          name: page
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/NrqlConditionResponse'
+          headers:
+            link:
+              type: array
+              items:
+                type: string
+              collectionFormat: "csv"
+              description: |
+                Links to related resources, in the format defined by [RFC 5988](https://tools.ietf.org/html/rfc5988#section-5). This will include a link with relation type `next` to the next page and `last` to the last page, unless this page is itself the last page.
+      description: |
+        <p>This API endpoint allows you to list the NRQL conditions for your Alerts policy.</p>
+
+        <p>Note: <strong>NRQL Baseline conditions are not available.</strong></p>
+      summary: List
+  '/alerts_nrql_conditions/policies/{policy_id}.json':
+    post:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Alerts policy ID
+          in: path
+          name: policy_id
+          required: true
+          type: integer
+        - description: Condition schema
+          in: body
+          name: nrql_condition
+          required: true
+          schema:
+            $ref: '#/definitions/NrqlCondition'
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/NrqlConditionResponse'
+      description: |
+        <p>This API endpoint allows you to create NRQL conditions for your Alerts policy.</p>
+
+        <p>Note: <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/rest-api-key">Admin User’s API Key</a> is required.</p>
+
+        <p>See our documentation for a discussion on <a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/rest-api-calls-new-relic-alerts#conditions-create" target="_blank">creating conditions for policies</a>.</p>
+      summary: Create
+  '/alerts_nrql_conditions/{condition_id}.json':
+    delete:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Alerts condition ID
+          in: path
+          name: condition_id
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/NrqlConditionResponse'
+      description: |
+        <p>This API endpoint allows you to delete NRQL conditions for your Alerts policy.</p>
+
+        <p><strong>NRQL Baseline conditions are not available.</strong></p>
+
+        <p>Note: <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/rest-api-key">Admin User’s API Key</a> is required.</p>
+      summary: Delete
+    put:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Alerts condition ID to update
+          in: path
+          name: condition_id
+          required: true
+          type: integer
+        - description: Condition schema
+          in: body
+          name: nrql_condition
+          required: true
+          schema:
+            $ref: '#/definitions/NrqlCondition'
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/NrqlConditionResponse'
+      description: |
+        <p>This API endpoint allows you to update NRQL conditions for your Alerts policy.</p>
+
+        <p><strong>NRQL Baseline conditions are not available.</strong></p>
+
+        <p>Note: <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/rest-api-key">Admin User’s API Key</a> is required.</p>
+
+        <p>See Alerts NRQL Conditions &gt; Create for an explanation of the field values.</p>
+      summary: Update
+  /alerts_plugins_conditions.json:
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Alerts policy ID
+          in: query
+          name: policy_id
+          required: true
+          type: integer
+        - description: Pagination index
+          in: query
+          name: page
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/PluginsConditionResponse'
+          headers:
+            link:
+              type: array
+              items:
+                type: string
+              collectionFormat: "csv"
+              description: |
+                Links to related resources, in the format defined by [RFC 5988](https://tools.ietf.org/html/rfc5988#section-5). This will include a link with relation type `next` to the next page and `last` to the last page, unless this page is itself the last page.
+      description: |
+        <p>This API endpoint allows you to list the Plugins conditions for your alert policy.</p>
+
+        <p>See our documentation for a discussion on <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/pagination-api-output" target="_blank">
+        output pagination</a>.</p>
+      summary: List
+  '/alerts_plugins_conditions/policies/{policy_id}.json':
+    post:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Alerts policy ID
+          in: path
+          name: policy_id
+          required: true
+          type: integer
+        - description: Condition schema
+          in: body
+          name: plugins_condition
+          required: true
+          schema:
+            $ref: '#/definitions/PluginsCondition'
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/PluginsConditionResponse'
+      description: |
+        <p>This API endpoint allows you to create Plugins conditions for your alert policies.</p>
+
+        <p>Note: <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/rest-api-key">Admin User’s API Key</a> is required.</p>
+
+        <p>See our documentation for a discussion on <a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/rest-api-calls-new-relic-alerts#plugins-conditions-create" target="_blank">creating conditions for plugins</a>.</p>
+
+        <p>All fields are required except for “runbook_url”, “enabled” (defaults to false).</p>
+
+        <p><a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#name" target="_blank">name</a>: A title for your condition.</p>
+
+        <p><a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#enabled" target="_blank">enabled</a>: The status of your condition (optional).</p>
+
+        <p><a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#entities" target="_blank">entities</a>: An array of instance IDs associated with your condition.</p>
+
+        <p><a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#metric_description" target="_blank">metric_description</a>: A title for the metric to display in notifications.</p>
+
+        <p><a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#metric" target="_blank">metric</a>: The metric to evaluate on.</p>
+
+        <p><a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#value_function" target="_blank">value_function</a>: min, max, average, sample_size, total, percent</p>
+
+        <p><a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#runbook_url" target="_blank">runbook_url</a>: Runbook URL to display in notifications (optional).</p>
+
+        <p><a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#terms_duration" target="_blank">terms[duration]</a> (in minutes): 5, 10, 15, 30, 60, 120.</p>
+
+        <p><a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#terms_operator" target="_blank">terms[operator]</a>: above, below, equal.</p>
+
+        <p><a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#terms_priority" target="_blank">terms[priority]</a>: critical, warning.</p>
+
+        <p><a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#terms_threshold" target="_blank">terms[threshold]</a>: Must be 0 or greater.</p>
+
+        <p><a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#terms_time_function" target="_blank">terms[time_function]</a>: all, any.</p>
+
+        <p><a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#plugin_id" target="_blank">plugin[id]</a>: The ID of the plugin.</p>
+
+        <p><a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#plugin_guid" target="_blank">plugin[guid]</a>: The GUID of the plugin.</p>
+      summary: Create
+  '/alerts_plugins_conditions/{condition_id}.json':
+    delete:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Alerts condition ID
+          in: path
+          name: condition_id
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/PluginsConditionResponse'
+      description: |
+        <p>This API endpoint allows you to delete Plugins conditions associated with your alert policy.</p>
+
+        <p>Note: <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/rest-api-key">Admin User’s API Key</a> is required.</p>
+
+        <p>See our documentation for a discussion on <a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/rest-api-calls-new-relic-alerts#plugins-conditions-delete" target="_blank">deleting Plugins conditions</a>.</p>
+      summary: Delete
+    put:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Alerts condition ID to update
+          in: path
+          name: condition_id
+          required: true
+          type: integer
+        - description: Condition schema
+          in: body
+          name: plugins_condition
+          required: true
+          schema:
+            $ref: '#/definitions/PluginsCondition'
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/PluginsConditionResponse'
+      description: |+
+        <p>This API endpoint allows you to update Plugins conditions for your alert policies.</p>
+
+        <p>Note: <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/rest-api-key">Admin User’s API Key</a> is required.</p>
+
+        <p>See Alerts Plugins Conditions &gt; Create for an explanation of the field values ued in this command or the online document on
+        <a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/rest-api-calls-new-relic-alerts#plugins-conditions-update" target="_blank">updating conditions for plugins</a>.</p>
+
+      summary: Update
+  /alerts_policies.json:
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Name (must be exact match)
+          in: query
+          name: 'filter[name]'
+          required: false
+          type: string
+        - description: Pagination index
+          in: query
+          name: page
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/PolicyResponse'
+          headers:
+            link:
+              type: array
+              items:
+                type: string
+              collectionFormat: "csv"
+              description: |
+                Links to related resources, in the format defined by [RFC 5988](https://tools.ietf.org/html/rfc5988#section-5). This will include a link with relation type `next` to the next page and `last` to the last page, unless this page is itself the last page.
+      description: |+
+        <p>This API endpoint works with new Alerts on alerts.newrelic.com.</p>
+
+        <p>This API endpoint returns a list of the alert policies associated with your New Relic account.</p>
+
+        <p>See our documentation for a discussion on <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/pagination-api-output" target="_blank">
+        output pagination</a>.</p>
+
+      summary: List
+    post:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Policy Schema
+          in: body
+          name: policy
+          required: true
+          schema:
+            $ref: '#/definitions/Policy'
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/PolicyResponse'
+      description: |+
+        <p>This API endpoint works with new Alerts on alerts.newrelic.com.</p>
+
+        <p>This Alerts API endpoint creates a policy associated with your New Relic account.</p>
+
+        <p>Note: <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/rest-api-key">Admin User’s API Key</a> is required.</p>
+
+        <p>Rollup stategy options:</p>
+
+        <ul>
+          <li>PER_POLICY</li>
+          <li>PER_CONDITION</li>
+          <li>PER_CONDITION_AND_TARGET</li>
+        </ul>
+
+        <p>See our documentation for a discussion on using the REST API for
+        <a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/rest-api-calls-new-relic-alerts#policies-create" target="_blank">creating new policies</a>.</p>
+
+      summary: Create
+  '/alerts_policies/{policy_id}.json':
+    put:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Policy ID
+          in: path
+          name: policy_id
+          required: true
+          type: integer
+        - description: Policy Schema
+          in: body
+          name: policy
+          required: true
+          schema:
+            $ref: '#/definitions/Policy'
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/PolicyResponse'
+      description: |+
+        <p>This API endpoint updates Alerts policies associated with your New Relic account.</p>
+
+        <p>Note: <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/rest-api-key">Admin User’s API Key</a> is required.</p>
+
+        <p>See our documentation for a discussion on using the REST API for
+        <a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/rest-api-calls-new-relic-alerts#policies-update" target="_blank">updating policies</a>.</p>
+
+      summary: Update
+    delete:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Policy ID
+          in: path
+          name: policy_id
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/PolicyResponse'
+      description: |+
+        <p>This API endpoint deletes Alerts policies associated with your New Relic account.</p>
+
+        <p>Note: <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/rest-api-key">Admin User’s API Key</a> is required.</p>
+
+        <p>See our documentation for a discussion on using the REST API for
+        <a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/rest-api-calls-new-relic-alerts#policies-delete" target="_blank">deleting policies</a>.</p>
+
+      summary: Delete
+  /alerts_policy_channels.json:
+    delete:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Policy ID
+          in: query
+          name: policy_id
+          required: true
+          type: integer
+        - description: Channel ID
+          in: query
+          name: channel_id
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/ChannelResponse'
+      description: |
+        <p>This API endpoint deletes Alerts policy/channel associations.</p>
+
+        <p>Note: <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/rest-api-key">Admin User’s API Key</a> is required.</p>
+
+        <p>See our documentation for a discussion on <a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/rest-api-calls-new-relic-alerts#policy-channels-delete">deleting notification channels with policies</a>.</p>
+      summary: Delete
+    put:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Policy ID
+          in: query
+          name: policy_id
+          required: true
+          type: integer
+        - description: Channel IDs
+          in: query
+          items:
+            type: string
+          name: channel_ids
+          required: true
+          type: array
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/PolicyChannelsResponse'
+      description: |
+        <p>This API endpoint updates policy/channel associations.</p>
+
+        <p>Note: <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/rest-api-key">Admin User’s API Key</a> is required.</p>
+
+        <p>See our documentation for a discussion on <a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/rest-api-calls-new-relic-alerts#policy-channels-update">updating notification channels with policies</a>.</p>
+      summary: Update
+  /alerts_synthetics_conditions.json:
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Alerts policy ID
+          in: query
+          name: policy_id
+          required: true
+          type: integer
+        - description: Pagination index
+          in: query
+          name: page
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/SyntheticsConditionResponse'
+          headers:
+            link:
+              type: array
+              items:
+                type: string
+              collectionFormat: "csv"
+              description: |
+                Links to related resources, in the format defined by [RFC 5988](https://tools.ietf.org/html/rfc5988#section-5). This will include a link with relation type `next` to the next page and `last` to the last page, unless this page is itself the last page.
+      description: |+
+        <p>This API endpoint allows you to list the Synthetics conditions for your alert policy.</p>
+
+        <p>See our documentation for a discussion on <a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/rest-api-calls-new-relic-alerts#synthetics-conditions-list" target="_blank">listing Synthetic conditions</a>
+        and <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/pagination-api-output" target="_blank"> output pagination</a>.</p>
+
+      summary: List
+  '/alerts_synthetics_conditions/policies/{policy_id}.json':
+    post:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Alerts policy ID
+          in: path
+          name: policy_id
+          required: true
+          type: integer
+        - description: Condition schema
+          in: body
+          name: synthetics_condition
+          required: true
+          schema:
+            $ref: '#/definitions/SyntheticsCondition'
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/SyntheticsConditionResponse'
+      description: |
+        <p>This API endpoint allows you to create Synthetics conditions for your alert policies.</p>
+
+        <p>Note: <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/rest-api-key">Admin User’s API Key</a> is required.</p>
+
+        <p>See our documentation for a discussion on <a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/rest-api-calls-new-relic-alerts#synthetics-conditions-create" target="_blank">creating Synthetic conditions</a>.</p>
+
+        <p>All fields are required except for “runbook_url”, “enabled” (defaults to false).</p>
+
+        <p><a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#name" target="_blank">name</a>: A title for your condition.</p>
+
+        <p><a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#monitor_id" target="_blank">monitor_id</a>: The GUID of the Synthetics monitor to alert on.</p>
+
+        <p><a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#runbook_url" target="_blank">runbook_url</a>: Runbook URL to display in notifications (optional).</p>
+
+        <p><a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/alerts-conditions-api-field-names#enabled" target="_blank">enabled</a>: The status of your condition (optional).</p>
+      summary: Create
+  '/alerts_synthetics_conditions/{condition_id}.json':
+    delete:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Alerts condition ID
+          in: path
+          name: condition_id
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/SyntheticsConditionResponse'
+      description: |+
+        <p>This API endpoint allows you to delete Synthetics conditions associated with your alert policy.</p>
+
+        <p>Note: <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/rest-api-key">Admin User’s API Key</a> is required.</p>
+
+        <p>See our documentation for a discussion on <a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/rest-api-calls-new-relic-alerts#synthetics-conditions-delete" target="_blank">deleting Synthetic conditions</a>.</p>
+
+      summary: Delete
+    put:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Alerts condition ID to update
+          in: path
+          name: condition_id
+          required: true
+          type: integer
+        - description: Condition schema
+          in: body
+          name: synthetics_condition
+          required: true
+          schema:
+            $ref: '#/definitions/SyntheticsCondition'
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/SyntheticsConditionResponse'
+      description: |
+        <p>This API endpoint allows you to update Synthetics conditions for your alert policies.</p>
+
+        <p>Note: <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/rest-api-key">Admin User’s API Key</a> is required.</p>
+
+        <p>See our documentation for a discussion on <a href="https://docs.newrelic.com/docs/alerts/new-relic-alerts/rest-api-alerts/rest-api-calls-new-relic-alerts#synthetics-conditions-update" target="_blank">updating Synthetic conditions</a>.</p>
+
+        <p>See Alerts Synthetics Conditions &gt; Create for an explanation of the field values used in this command.</p>
+      summary: Update
+  /alerts_violations.json:
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Pagination index
+          in: query
+          name: page
+          required: false
+          type: integer
+        - description: Retrieve violations created after this time
+          format: date-time
+          in: query
+          name: start_date
+          required: false
+          type: string
+        - description: Retrieve violations created before this time
+          format: date-time
+          in: query
+          name: end_date
+          required: false
+          type: string
+        - description: Filter by open violations
+          in: query
+          name: only_open
+          required: false
+          type: boolean
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/ViolationResponse'
+          headers:
+            link:
+              type: array
+              items:
+                type: string
+              collectionFormat: "csv"
+              description: |
+                Links to related resources, in the format defined by [RFC 5988](https://tools.ietf.org/html/rfc5988#section-5). This will include a link with relation type `next` to the next page and `last` to the last page, unless this page is itself the last page.
+      description: |+
+        <p>This API endpoint works with new Alerts on alerts.newrelic.com.</p>
+
+        <p>It returns a list of the violations associated with your New Relic account.</p>
+
+        <p>See our documentation for a discussion on <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/pagination-api-output" target="_blank">
+        output pagination</a>.</p>
+
+      summary: List
+  /applications.json:
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Filter by application name
+          in: query
+          name: 'filter[name]'
+          required: false
+          type: string
+        - description: Filter by application host
+          in: query
+          name: 'filter[host]'
+          required: false
+          type: string
+        - description: Filter by application ids
+          in: query
+          items:
+            type: string
+          name: 'filter[ids]'
+          required: false
+          type: array
+        - description: Filter by application language
+          in: query
+          name: 'filter[language]'
+          required: false
+          type: string
+        - description: Exclude links section from the response
+          in: query
+          name: exclude_links
+          required: false
+          type: boolean
+        - description: Pagination index
+          in: query
+          name: page
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/ApplicationResponse'
+          headers:
+            link:
+              type: array
+              items:
+                type: string
+              collectionFormat: "csv"
+              description: |
+                Links to related resources, in the format defined by [RFC 5988](https://tools.ietf.org/html/rfc5988#section-5). This will include a link with relation type `next` to the next page and `last` to the last page, unless this page is itself the last page.
+      description: |+
+        <p>This API endpoint returns a <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/pagination-api-output" target="_blank">paginated</a>
+        list of the Applications associated with your New Relic account. The time range for summary data is the last 3-4 minutes.</p>
+
+        <p>Applications can be filtered by their name, hosts, the list of application IDs or the application language as
+        reported by the agents.</p>
+
+        <p>See our documentation for a discussion and examples of
+        using <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/application-examples-v2/list-application-specific-server-host-instance-ids" target="_blank"> filters </a>
+        and <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/application-examples-v2/summary-data-examples-v2" target="_blank">summary data output</a>.</p>
+
+      summary: List
+  '/applications/{application_id}/deployments.json':
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Application ID
+          in: path
+          name: application_id
+          required: true
+          type: integer
+        - description: Pagination index
+          in: query
+          name: page
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/DeploymentResponse'
+          headers:
+            link:
+              type: array
+              items:
+                type: string
+              collectionFormat: "csv"
+              description: |
+                Links to related resources, in the format defined by [RFC 5988](https://tools.ietf.org/html/rfc5988#section-5). This will include a link with relation type `next` to the next page and `last` to the last page, unless this page is itself the last page.
+      description: |
+        <p>This API endpoint returns a paginated list of the deployments associated with a given application.</p>
+
+        <p>See our documentation for a discussion on <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/pagination-api-output">output pagination</a>.</p>
+      summary: List
+    post:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Application ID
+          in: path
+          name: application_id
+          required: true
+          type: integer
+        - description: Deployment schema
+          in: body
+          name: deployment
+          required: true
+          schema:
+            $ref: '#/definitions/Deployment'
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/DeploymentResponse'
+      description: "<p>This API endpoint creates a deployment record for a given application.\nDeployment records are created with the following attributes:</p>\n\n<p>Required:<br />\n\_\_- Application ID<br />\n\_\_- Revision, such as a git SHA<br /></p>\n\n<p>Optional:<br />\n\_\_- Changelog <br />\n\_\_- Description <br />\n\_\_- User posting the deployment<br /></p>\n\n<p>Note that the time of your deployment will be recorded as the current time in UTC.</p>\n"
+      summary: Create
+  '/applications/{application_id}/deployments/{id}.json':
+    delete:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Application ID
+          in: path
+          name: application_id
+          required: true
+          type: integer
+        - description: Deployment ID
+          in: path
+          name: id
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/DeploymentResponse'
+      description: |+
+        <p>This API endpoint deletes the specified deployment record.</p>
+
+        <p>Note: <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/rest-api-key">Admin User’s API Key</a> is required.</p>
+
+      summary: Delete
+  '/applications/{application_id}/hosts.json':
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Application ID
+          in: path
+          name: application_id
+          required: true
+          type: integer
+        - description: Filter by server hostname
+          in: query
+          name: 'filter[hostname]'
+          required: false
+          type: string
+        - description: Filter by application host ids
+          in: query
+          items:
+            type: string
+          name: 'filter[ids]'
+          required: false
+          type: array
+        - description: Pagination index
+          in: query
+          name: page
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/ApplicationHostResponse'
+          headers:
+            link:
+              type: array
+              items:
+                type: string
+              collectionFormat: "csv"
+              description: |
+                Links to related resources, in the format defined by [RFC 5988](https://tools.ietf.org/html/rfc5988#section-5). This will include a link with relation type `next` to the next page and `last` to the last page, unless this page is itself the last page.
+      description: |+
+        <p>This API endpoint returns a <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/pagination-api-output" target="_blank">
+        paginated</a> list of hosts associated with the given application. The time range for summary data is the last 3-4 minutes.</p>
+
+        <p>Application hosts can be filtered by hostname, or the list of application host IDs.</p>
+
+        <p>See our documentation for a discussion and examples of
+        using <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/application-examples-v2/list-application-specific-server-host-instance-ids" target="_blank"> filters </a>
+        and <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/application-examples-v2/summary-data-examples-v2" target="_blank">summary data output</a>.</p>
+
+      summary: List
+  '/applications/{application_id}/hosts/{host_id}/metrics.json':
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Application ID
+          in: path
+          name: application_id
+          required: true
+          type: integer
+        - description: Application Host ID
+          in: path
+          name: host_id
+          required: true
+          type: integer
+        - description: Filter metrics by name
+          in: query
+          name: name
+          required: false
+          type: string
+        - description: Pagination index (will be deprecated)
+          in: query
+          name: page
+          required: false
+          type: integer
+        - description: Cursor for next page (replacing page param)
+          in: query
+          name: cursor
+          required: false
+          type: string
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/MetricListResponse'
+          headers:
+            link:
+              type: array
+              items:
+                type: string
+              collectionFormat: "csv"
+              description: |
+                Links to related resources, in the format defined by [RFC 5988](https://tools.ietf.org/html/rfc5988#section-5). This will include a link with relation type `next` to the next page and `last` to the last page, unless this page is itself the last page.
+      description: |
+        <p>Return a list of known metrics and their value names for the given resource.</p>
+
+        <p>See our documentation for a discussion
+        on <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/pagination-api-output" target="_blank"> output pagination</a>
+        and for examples of <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/new-relic-rest-api-v2-getting-started#examples" target="_blank">requesting and using metric values</a>.</p>
+      summary: Metric Names
+  '/applications/{application_id}/hosts/{host_id}/metrics/data.json':
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Application ID
+          in: path
+          name: application_id
+          required: true
+          type: integer
+        - description: Application Host ID
+          in: path
+          name: host_id
+          required: true
+          type: integer
+        - description: Retrieve specific metrics by name
+          in: query
+          items:
+            type: string
+          name: names
+          required: true
+          type: array
+        - description: Retrieve specific metric values
+          in: query
+          items:
+            type: string
+          name: values
+          required: false
+          type: array
+        - description: Retrieve metrics after this time
+          format: date-time
+          in: query
+          name: from
+          required: false
+          type: string
+        - description: Retrieve metrics before this time
+          format: date-time
+          in: query
+          name: to
+          required: false
+          type: string
+        - description: Period of timeslices in seconds
+          in: query
+          name: period
+          required: false
+          type: integer
+        - description: Summarize the data
+          in: query
+          name: summarize
+          required: false
+          type: boolean
+        - description: Return unformatted raw values
+          in: query
+          name: raw
+          required: false
+          type: boolean
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/MetricDataResponse'
+      description: |+
+        <p>This API endpoint returns a list of values for each of the requested metrics. The list of available metrics
+        can be returned using the Metric Name API endpoint.</p>
+
+        <p>Metric data can be filtered by a number of parameters, including multiple names and values, and by time range.
+        Metric names and values will be matched intelligently in the background.</p>
+
+        <p>You can also retrieve a summarized data point across the entire time range selected by using the summarize
+        parameter.</p>
+
+        <p>See our documentation for a discussion on <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/pagination-api-output" target="_blank">
+        output pagination</a>, <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/extracting-metric-data" target="_blank"> time range</a>
+        related considerations, and for examples of <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/new-relic-rest-api-v2-getting-started#examples" target="_blank">requesting and using metric values</a>.</p>
+
+      summary: Metric Data
+  '/applications/{application_id}/hosts/{id}.json':
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Application ID
+          in: path
+          name: application_id
+          required: true
+          type: integer
+        - description: Application host ID
+          in: path
+          name: id
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/ApplicationHostResponse'
+      description: |+
+        <p>This API endpoint returns a single application host, identified by ID. The time range for summary data is the last 3-4 minutes.</p>
+
+        <p>See our documentation for a discussion of
+        <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/application-examples-v2/summary-data-examples-v2" target="_blank">summary data output</a>.</p>
+
+      summary: Show
+  '/applications/{application_id}/instances.json':
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Application ID
+          in: path
+          name: application_id
+          required: true
+          type: integer
+        - description: Filter by server hostname
+          in: query
+          name: 'filter[hostname]'
+          required: false
+          type: string
+        - description: Filter by application instance ids
+          in: query
+          items:
+            type: string
+          name: 'filter[ids]'
+          required: false
+          type: array
+        - description: Pagination index
+          in: query
+          name: page
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/ApplicationInstanceResponse'
+          headers:
+            link:
+              type: array
+              items:
+                type: string
+              collectionFormat: "csv"
+              description: |
+                Links to related resources, in the format defined by [RFC 5988](https://tools.ietf.org/html/rfc5988#section-5). This will include a link with relation type `next` to the next page and `last` to the last page, unless this page is itself the last page.
+      description: |+
+        <p>This API endpoint returns a <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/pagination-api-output" target="_blank">
+        paginated</a> list of instances associated with the given application. The time range for summary data is the last 3-4 minutes.</p>
+
+        <p>Application instances can be filtered by hostname, or the list of application instance IDs.</p>
+
+        <p>See our documentation for a discussion and examples of
+        using <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/application-examples-v2/list-application-specific-server-host-instance-ids" target="_blank"> filters </a>
+        and <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/application-examples-v2/summary-data-examples-v2" target="_blank">summary data output</a>.</p>
+
+      summary: List
+  '/applications/{application_id}/instances/{id}.json':
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Application ID
+          in: path
+          name: application_id
+          required: true
+          type: integer
+        - description: Application instance ID
+          in: path
+          name: id
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/ApplicationInstanceResponse'
+      description: |+
+        <p>This API endpoint returns a single application instance, identified by ID. The time range for summary data is the last 3-4 minutes.</p>
+
+        <p>See our documentation for a discussion of
+         <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/application-examples-v2/summary-data-examples-v2" target="_blank">summary data output</a>.</p>
+
+      summary: Show
+  '/applications/{application_id}/instances/{instance_id}/metrics.json':
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Application ID
+          in: path
+          name: application_id
+          required: true
+          type: integer
+        - description: Application Instance ID
+          in: path
+          name: instance_id
+          required: true
+          type: integer
+        - description: Filter metrics by name
+          in: query
+          name: name
+          required: false
+          type: string
+        - description: Pagination index (will be deprecated)
+          in: query
+          name: page
+          required: false
+          type: integer
+        - description: Cursor for next page (replacing page param)
+          in: query
+          name: cursor
+          required: false
+          type: string
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/MetricParserResponse'
+          headers:
+            link:
+              type: array
+              items:
+                type: string
+              collectionFormat: "csv"
+              description: |
+                Links to related resources, in the format defined by [RFC 5988](https://tools.ietf.org/html/rfc5988#section-5). This will include a link with relation type `next` to the next page and `last` to the last page, unless this page is itself the last page.
+      description: |
+        <p>Return a list of known metrics and their value names for the given resource.</p>
+
+        <p>See our documentation for a discussion
+        on <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/pagination-api-output" target="_blank"> output pagination</a>
+        and for examples of <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/new-relic-rest-api-v2-getting-started#examples" target="_blank">requesting and using metric values</a>.</p>
+      summary: Metric Names
+  '/applications/{application_id}/instances/{instance_id}/metrics/data.json':
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Application ID
+          in: path
+          name: application_id
+          required: true
+          type: integer
+        - description: Application Instance ID
+          in: path
+          name: instance_id
+          required: true
+          type: integer
+        - description: Retrieve specific metrics by name
+          in: query
+          items:
+            type: string
+          name: names
+          required: true
+          type: array
+        - description: Retrieve specific metric values
+          in: query
+          items:
+            type: string
+          name: values
+          required: false
+          type: array
+        - description: Retrieve metrics after this time
+          format: date-time
+          in: query
+          name: from
+          required: false
+          type: string
+        - description: Retrieve metrics before this time
+          format: date-time
+          in: query
+          name: to
+          required: false
+          type: string
+        - description: Period of timeslices in seconds
+          in: query
+          name: period
+          required: false
+          type: integer
+        - description: Summarize the data
+          in: query
+          name: summarize
+          required: false
+          type: boolean
+        - description: Return unformatted raw values
+          in: query
+          name: raw
+          required: false
+          type: boolean
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/MetricDataResponse'
+      description: |+
+        <p>This API endpoint returns a list of values for each of the requested metrics. The list of available metrics
+        can be returned using the Metric Name API endpoint.</p>
+
+        <p>Metric data can be filtered by a number of parameters, including multiple names and values, and by time range.
+        Metric names and values will be matched intelligently in the background.</p>
+
+        <p>You can also retrieve a summarized data point across the entire time range selected by using the summarize
+        parameter.</p>
+
+        <p>See our documentation for a discussion on <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/pagination-api-output" target="_blank">
+        output pagination</a>, <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/extracting-metric-data" target="_blank"> time range</a>
+        related considerations, and for examples of <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/new-relic-rest-api-v2-getting-started#examples" target="_blank">requesting and using metric values</a>.</p>
+
+      summary: Metric Data
+  '/applications/{application_id}/metrics.json':
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Application ID
+          in: path
+          name: application_id
+          required: true
+          type: integer
+        - description: Filter metrics by name
+          in: query
+          name: name
+          required: false
+          type: string
+        - description: Pagination index (will be deprecated)
+          in: query
+          name: page
+          required: false
+          type: integer
+        - description: Cursor for next page (replacing page param)
+          in: query
+          name: cursor
+          required: false
+          type: string
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/MetricParserResponse'
+          headers:
+            link:
+              type: array
+              items:
+                type: string
+              collectionFormat: "csv"
+              description: |
+                Links to related resources, in the format defined by [RFC 5988](https://tools.ietf.org/html/rfc5988#section-5). This will include a link with relation type `next` to the next page and `last` to the last page, unless this page is itself the last page.
+      description: |
+        <p>Return a list of known metrics and their value names for the given resource.</p>
+
+        <p>See our documentation for a discussion
+        on <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/pagination-api-output" target="_blank"> output pagination</a>
+        and for examples of <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/new-relic-rest-api-v2-getting-started#examples" target="_blank">requesting and using metric values</a>.</p>
+      summary: Metric Names
+  '/applications/{application_id}/metrics/data.json':
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Application ID
+          in: path
+          name: application_id
+          required: true
+          type: integer
+        - description: Retrieve specific metrics by name
+          in: query
+          items:
+            type: string
+          name: names
+          required: true
+          type: array
+        - description: Retrieve specific metric values
+          in: query
+          items:
+            type: string
+          name: values
+          required: false
+          type: array
+        - description: Retrieve metrics after this time
+          format: date-time
+          in: query
+          name: from
+          required: false
+          type: string
+        - description: Retrieve metrics before this time
+          format: date-time
+          in: query
+          name: to
+          required: false
+          type: string
+        - description: Period of timeslices in seconds
+          in: query
+          name: period
+          required: false
+          type: integer
+        - description: Summarize the data
+          in: query
+          name: summarize
+          required: false
+          type: boolean
+        - description: Return unformatted raw values
+          in: query
+          name: raw
+          required: false
+          type: boolean
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/MetricDataResponse'
+      description: |+
+        <p>This API endpoint returns a list of values for each of the requested metrics. The list of available metrics
+        can be returned using the Metric Name API endpoint.</p>
+
+        <p>Metric data can be filtered by a number of parameters, including multiple names and values, and by time range.
+        Metric names and values will be matched intelligently in the background.</p>
+
+        <p>You can also retrieve a summarized data point across the entire time range selected by using the summarize
+        parameter.</p>
+
+        <p>See our documentation for a discussion on <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/pagination-api-output" target="_blank">
+        output pagination</a>, <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/extracting-metric-data" target="_blank"> time range</a>
+        related considerations, and for examples of <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/new-relic-rest-api-v2-getting-started#examples" target="_blank">requesting and using metric values</a>.</p>
+
+      summary: Metric Data
+  '/applications/{id}.json':
+    delete:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Application ID
+          in: path
+          name: id
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/ApplicationResponse'
+      description: |
+        <p>This API endpoint deletes an application and all of its reported data.</p>
+
+        <p><strong>WARNING</strong>: Only applications that have stopped reporting can be deleted. This is an irreversible process
+        which will delete all reported data for this application.</p>
+      summary: Delete
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Application ID
+          in: path
+          name: id
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/ApplicationResponse'
+      description: |+
+        <p>This API endpoint returns a single Application, identified by ID. The time range for summary data is the last 3-4 minutes.</p>
+
+        <p>See our documentation for a discussion of the
+        <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/application-examples-v2/summary-data-examples-v2" target="_blank"> summary data output</a>.</p>
+
+      summary: Show
+    put:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Application ID
+          in: path
+          name: id
+          required: true
+          type: integer
+        - description: Application schema
+          in: body
+          name: application
+          required: true
+          schema:
+            $ref: '#/definitions/Application'
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/ApplicationResponse'
+      description: |+
+        <p>This API endpoint allows you to update certain parameters of your application.</p>
+
+        <p>The input is expected to be in <strong>JSON or XML</strong> format in the body parameter of the PUT request. The exact
+        schema is defined below. Any extra parameters passed in the body <strong>will be ignored</strong>.</p>
+
+        <p>See our documentation for a discussion and simple example of
+        <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/application-examples-v2/changing-alias-your-application-v2" target="_blank"> updating</a>
+        an application.</p>
+
+      summary: Update
+  /browser_applications.json:
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Filter by application name
+          in: query
+          name: 'filter[name]'
+          required: false
+          type: string
+        - description: Filter by application ids
+          in: query
+          items:
+            type: string
+          name: 'filter[ids]'
+          required: false
+          type: array
+        - description: Pagination index
+          in: query
+          name: page
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/BrowserApplicationResponse'
+          headers:
+            link:
+              type: array
+              items:
+                type: string
+              collectionFormat: "csv"
+              description: |
+                Links to related resources, in the format defined by [RFC 5988](https://tools.ietf.org/html/rfc5988#section-5). This will include a link with relation type `next` to the next page and `last` to the last page, unless this page is itself the last page.
+      description: |
+        <p>This API endpoint returns a list of the Browser Applications associated with your New Relic account.</p>
+
+        <p>Browser Applications can be filtered by their name, or by the application IDs.</p>
+      summary: List
+    post:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Browser Application Schema
+          in: body
+          name: browser_application
+          required: true
+          schema:
+            $ref: '#/definitions/BrowserApplication'
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/BrowserApplicationResponse'
+      description: |
+        <p>This API endpoint allows you to create a standalone Browser Application.</p>
+      summary: Create
+  /components.json:
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Filter components by name
+          in: query
+          name: 'filter[name]'
+          required: false
+          type: string
+        - description: Filter components by ids
+          in: query
+          items:
+            type: string
+          name: 'filter[ids]'
+          required: false
+          type: array
+        - description: Filter components by the plugin
+          in: query
+          name: 'filter[plugin_id]'
+          required: false
+          type: integer
+        - description: Include component health status
+          in: query
+          name: health_status
+          required: false
+          type: boolean
+        - description: Pagination index
+          in: query
+          name: page
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/ComponentResponse'
+          headers:
+            link:
+              type: array
+              items:
+                type: string
+              collectionFormat: "csv"
+              description: |
+                Links to related resources, in the format defined by [RFC 5988](https://tools.ietf.org/html/rfc5988#section-5). This will include a link with relation type `next` to the next page and `last` to the last page, unless this page is itself the last page.
+      description: |
+        <p>This API endpoint returns a list of the plugin components associated with your New Relic account.
+        Plugins can be filtered by their name, the list of component IDs or a plugin ID.
+        See our documentation for a discussion on <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/plugin-examples-v2/get-individual-plugin-components-v2" target="_blank"> listing components</a>
+        and <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/pagination-api-output" target="_blank"> output pagination</a>.</p>
+      summary: List
+  '/components/{component_id}/metrics.json':
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Component ID
+          in: path
+          name: component_id
+          required: true
+          type: integer
+        - description: Filter metrics by name
+          in: query
+          name: name
+          required: false
+          type: string
+        - description: Pagination index (will be deprecated)
+          in: query
+          name: page
+          required: false
+          type: integer
+        - description: Cursor for next page (replacing page param)
+          in: query
+          name: cursor
+          required: false
+          type: string
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/MetricParserResponse'
+          headers:
+            link:
+              type: array
+              items:
+                type: string
+              collectionFormat: "csv"
+              description: |
+                Links to related resources, in the format defined by [RFC 5988](https://tools.ietf.org/html/rfc5988#section-5). This will include a link with relation type `next` to the next page and `last` to the last page, unless this page is itself the last page.
+      description: |
+        <p>Return a list of known metrics and their value names for the given resource.</p>
+
+        <p>See our documentation for a discussion
+        on <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/pagination-api-output" target="_blank"> output pagination</a>
+        and for examples of <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/new-relic-rest-api-v2-getting-started#examples" target="_blank">requesting and using metric values</a>.</p>
+      summary: Metric Names
+  '/components/{component_id}/metrics/data.json':
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Component ID
+          in: path
+          name: component_id
+          required: true
+          type: integer
+        - description: Retrieve specific metrics by name
+          in: query
+          items:
+            type: string
+          name: names
+          required: true
+          type: array
+        - description: Retrieve specific metric values
+          in: query
+          items:
+            type: string
+          name: values
+          required: false
+          type: array
+        - description: Retrieve metrics after this time
+          format: date-time
+          in: query
+          name: from
+          required: false
+          type: string
+        - description: Retrieve metrics before this time
+          format: date-time
+          in: query
+          name: to
+          required: false
+          type: string
+        - description: Period of timeslices in seconds
+          in: query
+          name: period
+          required: false
+          type: integer
+        - description: Summarize the data
+          in: query
+          name: summarize
+          required: false
+          type: boolean
+        - description: Return unformatted raw values
+          in: query
+          name: raw
+          required: false
+          type: boolean
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/MetricDataResponse'
+      description: |+
+        <p>This API endpoint returns a list of values for each of the requested metrics. The list of available metrics
+        can be returned using the Metric Name API endpoint.</p>
+
+        <p>Metric data can be filtered by a number of parameters, including multiple names and values, and by time range.
+        Metric names and values will be matched intelligently in the background.</p>
+
+        <p>You can also retrieve a summarized data point across the entire time range selected by using the summarize
+        parameter.</p>
+
+        <p>See our documentation for a discussion on <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/pagination-api-output" target="_blank">
+        output pagination</a>, <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/extracting-metric-data" target="_blank"> time range</a>
+        related considerations, and for examples of <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/new-relic-rest-api-v2-getting-started#examples" target="_blank">requesting and using metric values</a>.</p>
+
+      summary: Metric Data
+  '/components/{id}.json':
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Plugin ID
+          in: path
+          name: id
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/ComponentResponse'
+      description: |
+        <p>This API endpoint returns a single component, identified by its ID.
+        See our documentation for a discussion on <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/plugin-examples-v2/get-individual-plugin-components-v2#list_component_id" target="blank">listing components by ID</a>.</p>
+      summary: Show
+  /dashboards.json:
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Contains title
+          in: query
+          name: 'filter[title]'
+          required: false
+          type: string
+        - description: Category is one of ('all' | 'favorite' | 'mine')
+          in: query
+          name: 'filter[category]'
+          required: false
+          type: string
+        - description: Created before given date
+          format: date-time
+          in: query
+          name: 'filter[created_before]'
+          required: false
+          type: string
+        - description: Created after given date
+          format: date-time
+          in: query
+          name: 'filter[created_after]'
+          required: false
+          type: string
+        - description: Updated before given date
+          format: date-time
+          in: query
+          name: 'filter[updated_before]'
+          required: false
+          type: string
+        - description: Updated after given date
+          format: date-time
+          in: query
+          name: 'filter[updated_after]'
+          required: false
+          type: string
+        - description: Sort is one of ('name' | 'recently viewed' | 'last edited')
+          in: query
+          name: sort
+          required: false
+          type: string
+        - description: Pagination index
+          in: query
+          name: page
+          required: false
+          type: integer
+        - description: Number of items per page
+          in: query
+          name: per_page
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          headers:
+            link:
+              type: array
+              items:
+                type: string
+              collectionFormat: "csv"
+              description: |
+                Links to related resources, in the format defined by [RFC 5988](https://tools.ietf.org/html/rfc5988#section-5). This will include a link with relation type `next` to the next page and `last` to the last page, unless this page is itself the last page.
+      description: |
+        <p>This API endpoint allows you to fetch a paginated and sorted list
+        of Insights dashboards. Dashboards can be filtered by title, owner
+        email, category, created date, and updated date. This endpoint will
+        not return widget metadata.</p>
+
+        <p>For more information, see <a href="https://docs.newrelic.com/docs/insights-dashboard-api">Dashboard API documentation</a>.</p>
+      summary: List
+    post:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Dashboard schema
+          in: body
+          name: dashboard
+          required: true
+          schema:
+            $ref: '#/definitions/Dashboard'
+      responses:
+        '200':
+          description: No response was specified
+      description: |
+        <p>This API endpoint allows you to create a new Insights dashboard in the account that your API key has access to.</p>
+
+        <p>For more information, see <a href="https://docs.newrelic.com/docs/insights-dashboard-api">Dashboard API documentation</a>.</p>
+      summary: Create
+  '/dashboards/{id}.json':
+    delete:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Dashboard ID
+          in: path
+          name: id
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+      description: |
+        <p>This API endpoint allows you to delete any Insights dashboard in the account that your API key has access to.</p>
+
+        <p>For more, see the <a href="https://docs.newrelic.com/docs/insights-dashboard-api">Dashboard API documentation</a>.</p>
+      summary: Delete
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Dashboard ID
+          in: path
+          name: id
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+      description: |
+        <p>This API endpoint allows you to view an existing dashboard and widget
+        metadata for a specific dashboard ID. If a widget contains data from
+        an account that the user does not have access to, the widget will
+        be returned as an “inaccessible” visualization type.</p>
+
+        <p>For more information, see <a href="https://docs.newrelic.com/docs/insights-dashboard-api">Dashboard API documentation</a>.</p>
+      summary: Show
+    put:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Dashboard ID
+          in: path
+          name: id
+          required: true
+          type: integer
+        - description: Dashboard schema
+          in: body
+          name: dashboard
+          required: true
+          schema:
+            $ref: '#/definitions/Dashboard'
+      responses:
+        '200':
+          description: No response was specified
+      description: |
+        <p>This API endpoint allows you to update any existing Insights dashboard that you have permission to modify within the account that your API key has access to.</p>
+
+        <p>For more information, see <a href="https://docs.newrelic.com/docs/insights-dashboard-api">Dashboard API documentation</a>.</p>
+      summary: Update
+  /key_transactions.json:
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Filter by name
+          in: query
+          name: 'filter[name]'
+          required: false
+          type: string
+        - description: Filter by policy IDs
+          in: query
+          items:
+            type: string
+          name: 'filter[ids]'
+          required: false
+          type: array
+        - description: Pagination index
+          in: query
+          name: page
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/KeyTransactionResponse'
+          headers:
+            link:
+              type: array
+              items:
+                type: string
+              collectionFormat: "csv"
+              description: |
+                Links to related resources, in the format defined by [RFC 5988](https://tools.ietf.org/html/rfc5988#section-5). This will include a link with relation type `next` to the next page and `last` to the last page, unless this page is itself the last page.
+      description: |+
+        <p>This API endpoint returns a <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/pagination-api-output" target="_blank">paginated</a>
+        list of the key transactions associated with your New Relic account.  The time range for summary data is the last 10 minutes.</p>
+
+        <p>Key transactions can be filtered by their name or list of IDs.</p>
+
+        <p>See our documentation for a discussion of
+        <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/application-examples-v2/summary-data-examples-v2" target="_blank">summary data output</a>.</p>
+
+      summary: List
+  '/key_transactions/{id}.json':
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Key transaction ID
+          in: path
+          name: id
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/KeyTransactionResponse'
+      description: |+
+        <p>This endpoint returns a single key transaction, identified by ID. The time range for summary data is the last 10 minutes.</p>
+
+        <p>See our documentation for a discussion of
+        <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/application-examples-v2/summary-data-examples-v2" target="_blank">summary data output</a>.</p>
+
+      summary: Show
+  /labels.json:
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Pagination index
+          in: query
+          name: page
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/LabelResponse'
+          headers:
+            link:
+              type: array
+              items:
+                type: string
+              collectionFormat: "csv"
+              description: |
+                Links to related resources, in the format defined by [RFC 5988](https://tools.ietf.org/html/rfc5988#section-5). This will include a link with relation type `next` to the next page and `last` to the last page, unless this page is itself the last page.
+      description: |
+        <p>This API endpoint returns a <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/pagination-api-output" target="_blank">paginated</a> list of the labels available for the account.</p>
+      summary: List
+    put:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Label schema
+          in: body
+          name: label
+          required: true
+          schema:
+            $ref: '#/definitions/Label'
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/LabelResponse'
+      description: |
+        <p>This API endpoint will create a new label with the provided category and name.</p>
+
+        <p>Include the application and server IDs to which the label should be applied in the corresponding arrays.
+        You may omit the “applications” OR “servers” arrays, if not needed.</p>
+
+        <p>See our documentation for a discussion on obtaining
+        <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/application-examples-v2/listing-your-app-id-metric-data-v2" target="_blank">application</a>
+        and
+        <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/server-examples-v2/list-your-server-id-metric-data-v2" target="_blank">server</a> IDs.</p>
+      summary: Create
+  '/labels/{key}.json':
+    delete:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: 'Label key. Example: ''Language:Java'''
+          in: path
+          name: key
+          required: true
+          type: string
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/LabelResponse'
+      description: |
+        <p>When applications are provided, this endpoint will remove those applications from the label.</p>
+
+        <p>When no applications are provided, this endpoint will remove the label.</p>
+      summary: Delete
+  /mobile_applications.json:
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/MobileApplicationResponse'
+      description: |
+        <p>This API endpoint returns a list of the Mobile Applications associated with your New Relic account.</p>
+
+        <p>MobileApplications can be filtered by their name, or by the application IDs.</p>
+      summary: List
+  '/mobile_applications/{id}.json':
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Mobile Application ID
+          in: path
+          name: id
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/MobileApplicationResponse'
+      description: |
+        <p>This API endpoint returns a single Mobile Application, identified by ID. The time range for summary data is the last 30 minutes.</p>
+      summary: Show
+  '/mobile_applications/{mobile_application_id}/metrics.json':
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Mobile application ID
+          in: path
+          name: mobile_application_id
+          required: true
+          type: integer
+        - description: Filter metrics by name
+          in: query
+          name: name
+          required: false
+          type: string
+        - description: Pagination index (will be deprecated)
+          in: query
+          name: page
+          required: false
+          type: integer
+        - description: Cursor for next page (replacing page param)
+          in: query
+          name: cursor
+          required: false
+          type: string
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/MetricParserResponse'
+          headers:
+            link:
+              type: array
+              items:
+                type: string
+              collectionFormat: "csv"
+              description: |
+                Links to related resources, in the format defined by [RFC 5988](https://tools.ietf.org/html/rfc5988#section-5). This will include a link with relation type `next` to the next page and `last` to the last page, unless this page is itself the last page.
+      description: |
+        <p>Return a list of known metrics and their value names for the given resource.</p>
+
+        <p>See our documentation for a discussion
+        on <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/pagination-api-output" target="_blank"> output pagination</a>
+        and for examples of <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/new-relic-rest-api-v2-getting-started#examples" target="_blank">requesting and using metric values</a>.</p>
+      summary: Metric Names
+  '/mobile_applications/{mobile_application_id}/metrics/data.json':
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Mobile application ID
+          in: path
+          name: mobile_application_id
+          required: true
+          type: integer
+        - description: Retrieve specific metrics by name
+          in: query
+          items:
+            type: string
+          name: names
+          required: true
+          type: array
+        - description: Retrieve specific metric values
+          in: query
+          items:
+            type: string
+          name: values
+          required: false
+          type: array
+        - description: Retrieve metrics after this time
+          format: date-time
+          in: query
+          name: from
+          required: false
+          type: string
+        - description: Retrieve metrics before this time
+          format: date-time
+          in: query
+          name: to
+          required: false
+          type: string
+        - description: Period of timeslices in seconds
+          in: query
+          name: period
+          required: false
+          type: integer
+        - description: Summarize the data
+          in: query
+          name: summarize
+          required: false
+          type: boolean
+        - description: Return unformatted raw values
+          in: query
+          name: raw
+          required: false
+          type: boolean
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/MetricDataResponse'
+      description: |+
+        <p>This API endpoint returns a list of values for each of the requested metrics. The list of available metrics
+        can be returned using the Metric Name API endpoint.</p>
+
+        <p>Metric data can be filtered by a number of parameters, including multiple names and values, and by time range.
+        Metric names and values will be matched intelligently in the background.</p>
+
+        <p>You can also retrieve a summarized data point across the entire time range selected by using the summarize
+        parameter.</p>
+
+        <p>See our documentation for a discussion on <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/pagination-api-output" target="_blank">
+        output pagination</a>, <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/extracting-metric-data" target="_blank"> time range</a>
+        related considerations, and for examples of <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/new-relic-rest-api-v2-getting-started#examples" target="_blank">requesting and using metric values</a>.</p>
+
+      summary: Metric Data
+  /plugins.json:
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Filter plugin by guid
+          in: query
+          name: 'filter[guid]'
+          required: false
+          type: string
+        - description: Filter plugin by ids
+          in: query
+          items:
+            type: string
+          name: 'filter[ids]'
+          required: false
+          type: array
+        - description: Pagination index
+          in: query
+          name: page
+          required: false
+          type: integer
+        - description: Include all data about a plugin
+          in: query
+          name: detailed
+          required: false
+          type: boolean
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/PluginResponse'
+          headers:
+            link:
+              type: array
+              items:
+                type: string
+              collectionFormat: "csv"
+              description: |
+                Links to related resources, in the format defined by [RFC 5988](https://tools.ietf.org/html/rfc5988#section-5). This will include a link with relation type `next` to the next page and `last` to the last page, unless this page is itself the last page.
+      description: |+
+        <p>This API endpoint returns a list of the Plugins associated with your New Relic account.</p>
+
+        <p>Plugins can be filtered by their guid or the list of plugin IDs.</p>
+
+        <p>See our documentation for a discussion on <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/pagination-api-output" target="_blank">
+        output pagination</a>.</p>
+
+      summary: List
+  '/plugins/{id}.json':
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Plugin ID
+          in: path
+          name: id
+          required: true
+          type: integer
+        - description: Include all data about a plugin
+          in: query
+          name: detailed
+          required: false
+          type: boolean
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/PluginResponse'
+      description: |
+        <p>This API endpoint returns a single plugin, identified by its ID.</p>
+      summary: Show
+  /servers.json:
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Filter by name
+          in: query
+          name: 'filter[name]'
+          required: false
+          type: string
+        - description: Filter by host
+          in: query
+          name: 'filter[host]'
+          required: false
+          type: string
+        - description: Filter by server IDs
+          in: query
+          items:
+            type: string
+          name: 'filter[ids]'
+          required: false
+          type: array
+        - description: Filter by server labels (beta)
+          in: query
+          name: 'filter[labels]'
+          required: false
+          type: string
+        - description: Filter by reported in last 10 hours
+          in: query
+          name: 'filter[reported]'
+          required: false
+          type: boolean
+        - description: Pagination index
+          in: query
+          name: page
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/ServerResponse'
+          headers:
+            link:
+              type: array
+              items:
+                type: string
+              collectionFormat: "csv"
+              description: |
+                Links to related resources, in the format defined by [RFC 5988](https://tools.ietf.org/html/rfc5988#section-5). This will include a link with relation type `next` to the next page and `last` to the last page, unless this page is itself the last page.
+      description: |+
+        <p>This API endpoint returns a <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/pagination-api-output" target="_blank">paginated</a>
+        list of the Servers associated with your New Relic account. The time range for summary data is the last 2 minutes.</p>
+
+        <p>Servers can be filtered by their name, hostname, or the list of server IDs.</p>
+
+        <p>See our documentation for a discussion and examples of
+        using <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/application-examples-v2/list-application-specific-server-host-instance-ids" target="_blank">filters</a>
+        and <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/application-examples-v2/summary-data-examples-v2" target="_blank">summary data output</a>.</p>
+
+      summary: List
+  '/servers/{id}.json':
+    delete:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Server ID
+          in: path
+          name: id
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/ServerResponse'
+      description: |
+        <p>This API endpoint deletes a server and all of its reported data.</p>
+
+        <p><strong>WARNING</strong>: Only servers that have stopped reporting can be deleted. This is an irreversible process which
+        will delete all reported data for this server.</p>
+      summary: Delete
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Server ID
+          in: path
+          name: id
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/ServerResponse'
+      description: |+
+        <p>This API endpoint returns a single Server, identified by ID. The time range for summary data is the last 2 minutes.”</p>
+
+        <p>See our documentation for a discussion on
+        <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/application-examples-v2/summary-data-examples-v2" target="_blank">summary data output</a>.</p>
+
+      summary: Show
+    put:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Server ID
+          in: path
+          name: id
+          required: true
+          type: integer
+        - description: New name of the server
+          in: body
+          name: server
+          required: true
+          schema:
+            $ref: '#/definitions/Server'
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/ServerResponse'
+      description: |
+        <p>This API endpoint allows you to rename your server.</p>
+
+        <p>The input is expected to be in <strong>JSON or XML</strong> format in the body parameter of the PUT request. The exact
+        schema is defined below. Any extra parameters passed in the body <strong>will be ignored</strong>.</p>
+      summary: Update
+  '/servers/{server_id}/metrics.json':
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Server ID
+          in: path
+          name: server_id
+          required: true
+          type: integer
+        - description: Filter metrics by name
+          in: query
+          name: name
+          required: false
+          type: string
+        - description: Pagination index (will be deprecated)
+          in: query
+          name: page
+          required: false
+          type: integer
+        - description: Cursor for next page (replacing page param)
+          in: query
+          name: cursor
+          required: false
+          type: string
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/MetricParserResponse'
+          headers:
+            link:
+              type: array
+              items:
+                type: string
+              collectionFormat: "csv"
+              description: |
+                Links to related resources, in the format defined by [RFC 5988](https://tools.ietf.org/html/rfc5988#section-5). This will include a link with relation type `next` to the next page and `last` to the last page, unless this page is itself the last page.
+      description: |
+        <p>Return a list of known metrics and their value names for the given resource.</p>
+
+        <p>See our documentation for a discussion
+        on <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/pagination-api-output" target="_blank"> output pagination</a>
+        and for examples of <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/new-relic-rest-api-v2-getting-started#examples" target="_blank">requesting and using metric values</a>.</p>
+      summary: Metric Names
+  '/servers/{server_id}/metrics/data.json':
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: Server ID
+          in: path
+          name: server_id
+          required: true
+          type: integer
+        - description: Retrieve specific metrics by name
+          in: query
+          items:
+            type: string
+          name: names
+          required: true
+          type: array
+        - description: Retrieve specific metric values
+          in: query
+          items:
+            type: string
+          name: values
+          required: false
+          type: array
+        - description: Retrieve metrics after this time
+          format: date-time
+          in: query
+          name: from
+          required: false
+          type: string
+        - description: Retrieve metrics before this time
+          format: date-time
+          in: query
+          name: to
+          required: false
+          type: string
+        - description: Period of timeslices in seconds
+          in: query
+          name: period
+          required: false
+          type: integer
+        - description: Summarize the data
+          in: query
+          name: summarize
+          required: false
+          type: boolean
+        - description: Return unformatted raw values
+          in: query
+          name: raw
+          required: false
+          type: boolean
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/MetricDataResponse'
+      description: |+
+        <p>This API endpoint returns a list of values for each of the requested metrics. The list of available metrics
+        can be returned using the Metric Name API endpoint.</p>
+
+        <p>Metric data can be filtered by a number of parameters, including multiple names and values, and by time range.
+        Metric names and values will be matched intelligently in the background.</p>
+
+        <p>You can also retrieve a summarized data point across the entire time range selected by using the summarize
+        parameter.</p>
+
+        <p>See our documentation for a discussion on <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/pagination-api-output" target="_blank">
+        output pagination</a>, <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/extracting-metric-data" target="_blank"> time range</a>
+        related considerations, and for examples of <a href="https://docs.newrelic.com/docs/apis/rest-api-v2/requirements/new-relic-rest-api-v2-getting-started#examples" target="_blank">requesting and using metric values</a>.</p>
+
+      summary: Metric Data
+  '/usages/{product}.json':
+    get:
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - description: 'Available: apm, browser, mobile.'
+          in: path
+          name: product
+          required: true
+          type: string
+        - description: 'Format: YYYY-MM-DD'
+          format: date
+          in: query
+          name: start_date
+          required: true
+          type: string
+        - description: 'Format: YYYY-MM-DD'
+          format: date
+          in: query
+          name: end_date
+          required: true
+          type: string
+        - description: 'Include subaccounts usage? (default: false)'
+          in: query
+          name: include_subaccounts
+          required: false
+          type: boolean
+      responses:
+        '200':
+          description: No response was specified
+          schema:
+            $ref: '#/definitions/UsageDataResponse'
+      description: |
+        <p>This endpoint is deprecated as of June 12, 2018. It will be replaced with a new subscription usage API on July 10, 2018 and shut down permanently on Aug. 10, 2018. For more details, see https://discuss.newrelic.com/t/upcoming-changes-to-the-subscription-usage-experience/56453</p>
+
+        <p>Show a list of usage for a product in a given time frame.</p>
+
+        <p>NOTE: Currently you must request 1 month of data, or less, to retrieve daily usage. Requests for greater than 1 month will currently return only monthly usage.</p>
+      summary: List
+definitions:
+  Dashboard:
+    description: "Note from @ianfixes: this seems to be missing from the original spec"
+    type: object
+
+  AppSettingsBody:
+    properties:
+      app_apdex_threshold:
+        format: float
+        type: number
+      enable_real_user_monitoring:
+        type: boolean
+      end_user_apdex_threshold:
+        format: float
+        type: number
+  AppSettingsResponse:
+    properties:
+      app_apdex_threshold:
+        format: float
+        type: number
+      enable_real_user_monitoring:
+        type: boolean
+      end_user_apdex_threshold:
+        format: float
+        type: number
+      use_server_side_config:
+        type: boolean
+  AppSummaryDataResponse:
+    properties:
+      apdex_score:
+        format: float
+        type: number
+      error_rate:
+        format: float
+        type: number
+      instance_count:
+        type: integer
+      response_time:
+        format: float
+        type: number
+      throughput:
+        format: float
+        type: number
+  AppSummaryResponse:
+    properties:
+      apdex_score:
+        format: float
+        type: number
+      apdex_target:
+        format: float
+        type: number
+      concurrent_instance_count:
+        type: integer
+      error_rate:
+        format: float
+        type: number
+      host_count:
+        type: integer
+      instance_count:
+        type: integer
+      response_time:
+        format: float
+        type: number
+      throughput:
+        format: float
+        type: number
+  Application:
+    properties:
+      application:
+        $ref: '#/definitions/ApplicationBody'
+  ApplicationBody:
+    properties:
+      name:
+        type: string
+      settings:
+        $ref: '#/definitions/AppSettingsBody'
+  ApplicationHostLinksResponse:
+    properties:
+      application:
+        type: integer
+      application_instances:
+        items:
+          type: integer
+        type: array
+      server:
+        type: integer
+  ApplicationHostResponse:
+    properties:
+      application_hosts:
+        type: array
+        items:
+          $ref: '#/definitions/ApplicationHostResponseType'
+  ApplicationHostResponseType:
+    properties:
+      host:
+        type: string
+      application_name:
+        type: string
+      application_summary:
+        $ref: '#/definitions/AppSummaryDataResponse'
+      end_user_summary:
+        $ref: '#/definitions/EndUserSummaryDataResponse'
+      health_status:
+        type: string
+      id:
+        type: integer
+      language:
+        type: integer
+      links:
+        $ref: '#/definitions/ApplicationHostLinksResponse'
+  ApplicationInstanceLinksResponse:
+    properties:
+      application:
+        type: integer
+      application_host:
+        type: integer
+      server:
+        type: integer
+  ApplicationInstanceResponse:
+    properties:
+      application_instance:
+        $ref: '#/definitions/ApplicationInstanceResponseType'
+  ApplicationInstanceResponseType:
+    properties:
+      host:
+        type: string
+      application_name:
+        type: string
+      application_summary:
+        $ref: '#/definitions/AppSummaryDataResponse'
+      end_user_summary:
+        $ref: '#/definitions/EndUserSummaryDataResponse'
+      health_status:
+        type: string
+      id:
+        type: integer
+      language:
+        type: integer
+      links:
+        $ref: '#/definitions/ApplicationInstanceLinksResponse'
+      port:
+        type: integer
+  ApplicationLinksResponse:
+    properties:
+      servers:
+        items:
+          type: integer
+        type: array
+      application_hosts:
+        items:
+          type: integer
+        type: array
+      application_instances:
+        items:
+          type: integer
+        type: array
+  ApplicationResponse:
+    properties:
+      application:
+        $ref: '#/definitions/ApplicationResponseType'
+  ApplicationResponseType:
+    properties:
+      application_summary:
+        $ref: '#/definitions/AppSummaryResponse'
+      end_user_summary:
+        $ref: '#/definitions/EndUserSummaryResponse'
+      health_status:
+        type: string
+      id:
+        type: integer
+      language:
+        type: string
+      last_reported_at:
+        format: date-time
+        type: string
+      links:
+        $ref: '#/definitions/ApplicationLinksResponse'
+      name:
+        type: string
+      reporting:
+        type: boolean
+      settings:
+        $ref: '#/definitions/AppSettingsResponse'
+  BrowserApplication:
+    properties:
+      browser_application:
+        $ref: '#/definitions/BrowserApplicationBody'
+  BrowserApplicationBody:
+    properties:
+      name:
+        type: string
+  BrowserApplicationResponse:
+    properties:
+      browser_application:
+        $ref: '#/definitions/BrowserApplicationResponseType'
+  BrowserApplicationResponseType:
+    properties:
+      browser_monitoring_key:
+        type: string
+      id:
+        type: integer
+      loader_script:
+        type: string
+      name:
+        type: string
+  Channel:
+    properties:
+      channel:
+        $ref: '#/definitions/ChannelBody'
+  ChannelBody:
+    properties:
+      configuration:
+        type: object
+      name:
+        type: string
+      type:
+        type: string
+  ChannelLinksResponse:
+    properties:
+      policy_ids:
+        items:
+          type: integer
+        type: array
+  ChannelResponse:
+    properties:
+      channel:
+        $ref: '#/definitions/ChannelResponseType'
+  ChannelResponseType:
+    properties:
+      configuration:
+        type: object
+      id:
+        type: integer
+      links:
+        $ref: '#/definitions/ChannelLinksResponse'
+      name:
+        type: string
+      type:
+        type: string
+  ComponentResponse:
+    properties:
+      component:
+        $ref: '#/definitions/ComponentResponseType'
+  ComponentResponseType:
+    properties:
+      health_status:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      summary_metrics:
+        items:
+          $ref: '#/definitions/SummaryMetricResponse'
+        type: array
+  Condition:
+    properties:
+      condition:
+        $ref: '#/definitions/ConditionBody'
+  ConditionBody:
+    properties:
+      condition_scope:
+        type: string
+      enabled:
+        type: boolean
+      entities:
+        items:
+          type: integer
+        type: array
+      gc_metric:
+        type: string
+      metric:
+        type: string
+      name:
+        type: string
+      terms:
+        items:
+          $ref: '#/definitions/IJKTermsType'
+        type: array
+      type:
+        type: string
+      user_defined:
+        $ref: '#/definitions/UserDefinedConditionBody'
+      violation_close_timer:
+        type: integer
+  ConditionResponse:
+    properties:
+      condition:
+        $ref: '#/definitions/ConditionResponseType'
+  ConditionResponseType:
+    properties:
+      condition_scope:
+        type: string
+      enabled:
+        type: boolean
+      entities:
+        items:
+          type: integer
+        type: array
+      gc_metric:
+        type: string
+      id:
+        type: integer
+      metric:
+        type: string
+      name:
+        type: string
+      runbook_url:
+        type: string
+      terms:
+        items:
+          $ref: '#/definitions/IJKTermsType'
+        type: array
+      type:
+        type: string
+      user_defined:
+        $ref: '#/definitions/UserDefinedConditionResponse'
+      violation_close_timer:
+        type: integer
+  CrashSummaryResponse:
+    properties:
+      crash_count:
+        type: integer
+      crash_rate:
+        format: float
+        type: number
+      supports_crash_data:
+        type: boolean
+      unresolved_crash_count:
+        type: integer
+  Deployment:
+    properties:
+      deployment:
+        $ref: '#/definitions/DeploymentBody'
+  DeploymentBody:
+    properties:
+      changelog:
+        type: string
+      description:
+        type: string
+      revision:
+        type: string
+      user:
+        type: string
+  DeploymentLinksResponse:
+    properties:
+      application:
+        type: integer
+  DeploymentResponse:
+    properties:
+      deployment:
+        $ref: '#/definitions/DeploymentResponseType'
+  DeploymentResponseType:
+    properties:
+      changelog:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      links:
+        $ref: '#/definitions/DeploymentLinksResponse'
+      revision:
+        type: string
+      timestamp:
+        format: date-time
+        type: string
+      user:
+        type: string
+  EndUserSummaryDataResponse:
+    properties:
+      apdex_score:
+        format: float
+        type: number
+      response_time:
+        format: float
+        type: number
+      throughput:
+        format: float
+        type: number
+  EndUserSummaryResponse:
+    properties:
+      apdex_score:
+        format: float
+        type: number
+      apdex_target:
+        format: float
+        type: number
+      response_time:
+        format: float
+        type: number
+      throughput:
+        format: float
+        type: number
+  Event:
+    properties:
+      event:
+        $ref: '#/definitions/EventBody'
+  EventBody:
+    properties:
+      closed_at:
+        format: date-time
+        type: string
+      created_at:
+        format: date-time
+        type: string
+      level:
+        type: string
+      message:
+        type: string
+      payload:
+        type: object
+      type:
+        type: string
+  EventLinksResponse:
+    properties:
+      downtime:
+        type: integer
+      incidents:
+        items:
+          type: integer
+        type: array
+  EventResponse:
+    properties:
+      event:
+        $ref: '#/definitions/EventResponseType'
+  EventResponseType:
+    properties:
+      closed_at:
+        format: date-time
+        type: string
+      created_at:
+        format: date-time
+        type: string
+      id:
+        type: integer
+      level:
+        type: string
+      links:
+        $ref: '#/definitions/EventLinksResponse'
+      message:
+        type: string
+      payload:
+        type: object
+      type:
+        type: string
+  ExternalServiceCondition:
+    properties:
+      external_service_condition:
+        $ref: '#/definitions/ExternalServiceConditionBody'
+  ExternalServiceConditionBody:
+    properties:
+      enabled:
+        type: boolean
+      entities:
+        items:
+          type: integer
+        type: array
+      external_service_url:
+        type: string
+      metric:
+        type: string
+      name:
+        type: string
+      runbook_url:
+        type: string
+      terms:
+        items:
+          $ref: '#/definitions/IJKTermsType'
+        type: array
+      type:
+        type: string
+  ExternalServiceConditionResponse:
+    properties:
+      external_service_condition:
+        $ref: '#/definitions/ExternalServiceConditionResponseType'
+  ExternalServiceConditionResponseType:
+    properties:
+      enabled:
+        type: boolean
+      entities:
+        items:
+          type: integer
+        type: array
+      external_service_url:
+        type: string
+      id:
+        type: integer
+      metric:
+        type: string
+      name:
+        type: string
+      runbook_url:
+        type: string
+      terms:
+        items:
+          $ref: '#/definitions/IJKTermsType'
+        type: array
+      type:
+        type: string
+  IJKTermsType:
+    properties:
+      duration:
+        type: string
+      operator:
+        type: string
+      priority:
+        type: string
+      threshold:
+        type: string
+      time_function:
+        type: string
+  IncidentLinksResponse:
+    properties:
+      policy_id:
+        type: integer
+      violations:
+        items:
+          type: integer
+        type: array
+  IncidentResponse:
+    properties:
+      incident:
+        $ref: '#/definitions/IncidentResponseType'
+  IncidentResponseType:
+    properties:
+      closed_at:
+        type: integer
+      id:
+        type: integer
+      incident_preference:
+        type: integer
+      links:
+        $ref: '#/definitions/IncidentLinksResponse'
+      opened_at:
+        type: integer
+  KeyTransactionLinksResponse:
+    properties:
+      application:
+        description: Application from which this key transaction originated
+        type: integer
+  KeyTransactionResponse:
+    properties:
+      key_transaction:
+        $ref: '#/definitions/KeyTransactionResponseType'
+  KeyTransactionResponseType:
+    properties:
+      application_summary:
+        $ref: '#/definitions/AppSummaryResponse'
+      end_user_summary:
+        $ref: '#/definitions/EndUserSummaryResponse'
+      health_status:
+        type: string
+      id:
+        type: integer
+      last_reported_at:
+        format: date-time
+        type: string
+      links:
+        $ref: '#/definitions/KeyTransactionLinksResponse'
+      name:
+        type: string
+      reporting:
+        type: boolean
+      transaction_name:
+        type: string
+  Label:
+    properties:
+      label:
+        $ref: '#/definitions/LabelBody'
+  LabelBody:
+    properties:
+      category:
+        type: string
+      links:
+        $ref: '#/definitions/LabelLinksBody'
+      name:
+        type: string
+  LabelLinksBody:
+    properties:
+      servers:
+        items:
+          type: integer
+        type: array
+      applications:
+        items:
+          type: integer
+        type: array
+  LabelLinksResponse:
+    properties:
+      servers:
+        items:
+          type: integer
+        type: array
+      applications:
+        items:
+          type: integer
+        type: array
+  LabelOriginsResponse:
+    properties:
+      agents:
+        items:
+          type: integer
+        type: array
+      apm:
+        items:
+          type: integer
+        type: array
+      synthetics:
+        items:
+          type: integer
+        type: array
+  LabelResponse:
+    properties:
+      label:
+        $ref: '#/definitions/LabelResponseType'
+  LabelResponseType:
+    properties:
+      category:
+        type: string
+      key:
+        type: string
+      links:
+        $ref: '#/definitions/LabelLinksResponse'
+      name:
+        type: string
+      origins:
+        $ref: '#/definitions/LabelOriginsResponse'
+  MetricDataResponse:
+    properties:
+      metric_data:
+        $ref: '#/definitions/MetricDataResponseType'
+  MetricDataResponseType:
+    properties:
+      from:
+        format: date-time
+        type: string
+      metrics:
+        items:
+          $ref: '#/definitions/MetricResponse'
+        type: array
+      metrics_found:
+        type: string
+      metrics_not_found:
+        type: string
+      to:
+        format: date-time
+        type: string
+  MetricListResponse:
+    properties:
+      metrics:
+        type: array
+        items:
+          $ref: '#/definitions/MetricParserResponseType'
+  MetricParserResponse:
+    properties:
+      metric:
+        $ref: '#/definitions/MetricParserResponseType'
+  MetricParserResponseType:
+    properties:
+      name:
+        type: string
+      values:
+        items:
+          type: string
+        type: array
+  MetricResponse:
+    properties:
+      name:
+        type: string
+      timeslices:
+        items:
+          $ref: '#/definitions/TimesliceResponse'
+        type: array
+  MobileApplicationResponse:
+    properties:
+      application:
+        $ref: '#/definitions/MobileApplicationResponseType'
+  MobileApplicationResponseType:
+    properties:
+      crash_summary:
+        $ref: '#/definitions/CrashSummaryResponse'
+      health_status:
+        type: string
+      id:
+        type: integer
+      mobile_summary:
+        $ref: '#/definitions/MobileSummaryDataResponse'
+      name:
+        type: string
+      reporting:
+        type: boolean
+  MobileSummaryDataResponse:
+    properties:
+      active_users:
+        type: integer
+      calls_per_session:
+        format: float
+        type: number
+      failed_call_rate:
+        format: float
+        type: number
+      interaction_time:
+        format: float
+        type: number
+      launch_count:
+        type: integer
+      remote_error_rate:
+        format: float
+        type: number
+      response_time:
+        format: float
+        type: number
+      throughput:
+        format: float
+        type: number
+  NrqlBody:
+    properties:
+      query:
+        type: string
+      since_value:
+        type: string
+  NrqlCondition:
+    properties:
+      nrql_condition:
+        $ref: '#/definitions/NrqlConditionBody'
+  NrqlConditionBody:
+    properties:
+      enabled:
+        type: boolean
+      expected_groups:
+        type: integer
+      ignore_overlap:
+        type: boolean
+      name:
+        type: string
+      nrql:
+        $ref: '#/definitions/NrqlBody'
+      runbook_url:
+        type: string
+      terms:
+        items:
+          $ref: '#/definitions/IJKTermsType'
+        type: array
+      value_function:
+        type: string
+  NrqlConditionResponse:
+    properties:
+      nrql_condition:
+        $ref: '#/definitions/NrqlConditionResponseType'
+  NrqlConditionResponseType:
+    properties:
+      enabled:
+        type: boolean
+      expected_groups:
+        type: integer
+      id:
+        type: integer
+      ignore_overlap:
+        type: boolean
+      name:
+        type: string
+      nrql:
+        $ref: '#/definitions/NrqlResponse'
+      runbook_url:
+        type: string
+      terms:
+        items:
+          $ref: '#/definitions/IJKTermsType'
+        type: array
+      type:
+        type: string
+      value_function:
+        type: string
+  NrqlResponse:
+    properties:
+      query:
+        type: string
+      since_value:
+        type: string
+  PluginConditionSettingsBody:
+    properties:
+      guid:
+        type: string
+      id:
+        type: string
+  PluginConditionSettingsResponse:
+    properties:
+      guid:
+        type: string
+      id:
+        type: string
+  PluginDetailsResponse:
+    properties:
+      branding_image_url:
+        type: string
+      created_at:
+        format: date-time
+        type: string
+      description:
+        type: integer
+      download_url:
+        type: string
+      first_edited_at:
+        format: date-time
+        type: string
+      first_published_at:
+        format: date-time
+        type: string
+      has_unpublished_changes:
+        type: boolean
+      is_public:
+        type: string
+      last_edited_at:
+        format: date-time
+        type: string
+      last_published_at:
+        format: date-time
+        type: string
+      published_version:
+        type: string
+      publisher_about_url:
+        type: string
+      publisher_support_url:
+        type: string
+      short_name:
+        type: string
+      updated_at:
+        format: date-time
+        type: string
+      upgraded_at:
+        format: date-time
+        type: string
+  PluginResponse:
+    properties:
+      plugin:
+        $ref: '#/definitions/PluginResponseType'
+  PluginResponseType:
+    properties:
+      component_agent_count:
+        type: integer
+      details:
+        $ref: '#/definitions/PluginDetailsResponse'
+      guid:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      publisher:
+        type: string
+      summary_metrics:
+        items:
+          $ref: '#/definitions/SummaryMetricResponse'
+        type: array
+  PluginsCondition:
+    properties:
+      plugins_condition:
+        $ref: '#/definitions/PluginsConditionBody'
+  PluginsConditionBody:
+    properties:
+      enabled:
+        type: boolean
+      entities:
+        items:
+          type: integer
+        type: array
+      metric:
+        type: string
+      metric_description:
+        type: string
+      name:
+        type: string
+      plugin:
+        $ref: '#/definitions/PluginConditionSettingsBody'
+      runbook_url:
+        type: string
+      terms:
+        items:
+          $ref: '#/definitions/IJKTermsType'
+        type: array
+      value_function:
+        type: string
+  PluginsConditionResponse:
+    properties:
+      plugins_condition:
+        $ref: '#/definitions/PluginsConditionResponseType'
+  PluginsConditionResponseType:
+    properties:
+      enabled:
+        type: boolean
+      entities:
+        items:
+          type: integer
+        type: array
+      id:
+        type: integer
+      metric:
+        type: string
+      metric_description:
+        type: string
+      name:
+        type: string
+      plugin:
+        $ref: '#/definitions/PluginConditionSettingsResponse'
+      runbook_url:
+        type: string
+      terms:
+        items:
+          $ref: '#/definitions/IJKTermsType'
+        type: array
+      value_function:
+        type: string
+  Policy:
+    properties:
+      policy:
+        $ref: '#/definitions/PolicyBody'
+  PolicyBody:
+    properties:
+      incident_preference:
+        type: string
+      name:
+        type: string
+  PolicyChannels:
+    properties:
+      policy:
+        $ref: '#/definitions/PolicyChannelsBody'
+  PolicyChannelsBody:
+    properties:
+      channel_ids:
+        items:
+          type: integer
+        type: array
+      id:
+        type: integer
+  PolicyChannelsResponse:
+    properties:
+      policy:
+        $ref: '#/definitions/PolicyChannelsResponseType'
+  PolicyChannelsResponseType:
+    properties:
+      channel_ids:
+        items:
+          type: integer
+        type: array
+      id:
+        type: integer
+  PolicyResponse:
+    properties:
+      policy:
+        $ref: '#/definitions/PolicyResponseType'
+  PolicyResponseType:
+    properties:
+      created_at:
+        type: integer
+      id:
+        type: integer
+      incident_preference:
+        type: string
+      name:
+        type: string
+      updated_at:
+        type: integer
+  RecentEventResponse:
+    properties:
+      recent_event:
+        $ref: '#/definitions/RecentEventResponseType'
+  RecentEventResponseType:
+    properties:
+      description:
+        type: string
+      entity_group_id:
+        type: integer
+      entity_id:
+        type: integer
+      entity_type:
+        type: string
+      event_type:
+        type: string
+      id:
+        type: integer
+      incident_id:
+        type: integer
+      priority:
+        type: string
+      product:
+        type: string
+      timestamp:
+        type: integer
+  Server:
+    properties:
+      server:
+        $ref: '#/definitions/ServerBody'
+  ServerBody:
+    properties:
+      name:
+        type: string
+  ServerLinksResponse:
+    properties:
+      alert_policy:
+        type: integer
+  ServerResponse:
+    properties:
+      server:
+        $ref: '#/definitions/ServerResponseType'
+  ServerResponseType:
+    properties:
+      host:
+        type: string
+      account_id:
+        type: integer
+      health_status:
+        type: string
+      id:
+        type: integer
+      last_reported_at:
+        format: date-time
+        type: string
+      links:
+        $ref: '#/definitions/ServerLinksResponse'
+      name:
+        type: string
+      reporting:
+        type: boolean
+      summary:
+        $ref: '#/definitions/ServerSummaryResponse'
+  ServerSummaryResponse:
+    properties:
+      cpu:
+        format: float
+        type: number
+      cpu_stolen:
+        format: float
+        type: number
+      disk_io:
+        format: float
+        type: number
+      fullest_disk:
+        format: float
+        type: number
+      fullest_disk_free:
+        type: integer
+      memory:
+        format: float
+        type: number
+      memory_total:
+        type: integer
+      memory_used:
+        type: integer
+  SummaryMetricResponse:
+    properties:
+      id:
+        type: integer
+      metric:
+        type: string
+      name:
+        type: string
+      thresholds:
+        $ref: '#/definitions/SummaryMetricThresholdResponse'
+      value_function:
+        type: string
+      values:
+        $ref: '#/definitions/SummaryMetricValuesResponse'
+  SummaryMetricThresholdResponse:
+    properties:
+      caution:
+        format: float
+        type: number
+      critical:
+        format: float
+        type: number
+  SummaryMetricValuesResponse:
+    properties:
+      formatted:
+        type: string
+      raw:
+        format: float
+        type: number
+  SyntheticsCondition:
+    properties:
+      synthetics_condition:
+        $ref: '#/definitions/SyntheticsConditionBody'
+  SyntheticsConditionBody:
+    properties:
+      enabled:
+        type: boolean
+      monitor_id:
+        type: string
+      name:
+        type: string
+      runbook_url:
+        type: string
+  SyntheticsConditionResponse:
+    properties:
+      synthetics_condition:
+        $ref: '#/definitions/SyntheticsConditionResponseType'
+  SyntheticsConditionResponseType:
+    properties:
+      enabled:
+        type: boolean
+      id:
+        type: integer
+      monitor_id:
+        type: string
+      name:
+        type: string
+      runbook_url:
+        type: string
+  TargetDowntimeEventResponse:
+    properties:
+      downtime:
+        $ref: '#/definitions/TargetDowntimeEventResponseType'
+  TargetDowntimeEventResponseType:
+    properties:
+      duration:
+        type: integer
+      id:
+        type: integer
+      ip_address:
+        type: string
+      last_failure:
+        format: date-time
+        type: string
+      number_of_failures:
+        type: integer
+      opened_at:
+        format: date-time
+        type: string
+      url:
+        type: string
+  TimesliceResponse:
+    properties:
+      from:
+        format: date-time
+        type: string
+      to:
+        format: date-time
+        type: string
+      values:
+        type: object
+  UsageDataResponse:
+    properties:
+      usage_data:
+        $ref: '#/definitions/UsageDataResponseType'
+  UsageDataResponseType:
+    properties:
+      from:
+        type: string
+      product:
+        type: string
+      to:
+        type: string
+      unit:
+        type: string
+      usages:
+        items: {}
+        type: array
+  UserDefinedConditionBody:
+    properties:
+      metric:
+        type: string
+      value_function:
+        type: string
+  UserDefinedConditionResponse:
+    properties:
+      metric:
+        type: string
+      value_function:
+        type: string
+  Violation:
+    properties:
+      violation:
+        $ref: '#/definitions/ViolationBody'
+  ViolationBody:
+    properties:
+      closed_at:
+        type: integer
+      label:
+        type: string
+      opened_at:
+        type: integer
+  ViolationEntityResponse:
+    properties:
+      group_id:
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
+      product:
+        type: string
+      type:
+        type: string
+  ViolationLinksResponse:
+    properties:
+      condition_id:
+        type: integer
+      incident_id:
+        type: integer
+      policy_id:
+        type: integer
+  ViolationResponse:
+    properties:
+      violation:
+        $ref: '#/definitions/ViolationResponseType'
+  ViolationResponseType:
+    properties:
+      closed_at:
+        type: integer
+      condition_name:
+        type: string
+      duration:
+        type: integer
+      entity:
+        $ref: '#/definitions/ViolationEntityResponse'
+      id:
+        type: integer
+      label:
+        type: string
+      links:
+        $ref: '#/definitions/ViolationLinksResponse'
+      opened_at:
+        type: integer
+      policy_name:
+        type: string
+      priority:
+        type: string

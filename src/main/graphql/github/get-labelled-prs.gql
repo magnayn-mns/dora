@@ -1,0 +1,38 @@
+fragment PullRequestCommit on PullRequestCommit {
+  commit {
+    committedDate
+  }
+}
+
+fragment PullRequest on PullRequest {
+  __typename
+  id
+  number
+  title
+  author {
+    login
+  }
+  mergedAt
+  createdAt
+  commits(first: 1) {
+    edges {
+      node {
+        ...PullRequestCommit
+      }
+    }
+  }
+}
+
+query getLabelledPrs($repo: String!, $numLastPRs: Int!, $labelName: String!) {
+  repository(name: $repo, owner: "DigitalInnovation") {
+    label(name: $labelName) {
+      id
+      pullRequests(last: $numLastPRs) {
+        __typename
+        nodes {
+          ...PullRequest
+        }
+      }
+    }
+  }
+}
