@@ -16,12 +16,10 @@ import java.util.function.Supplier
 
 suspend fun main(vararg args: String) = coroutineScope {
 
-    var bearer = args[0]
-
         println("Hello world!")
         val apolloClient = ApolloClient.Builder()
             .serverUrl("https://api.github.com/graphql")
-            .addHttpHeader("Authorization", "Bearer " + bearer) // .networkTransport(QueueTestNetworkTransport())
+            .addHttpHeader("Authorization", "Bearer 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") // .networkTransport(QueueTestNetworkTransport())
             .build()
         val q = GetTeamMembersQuery("price-domain", "DigitalInnovation")
 

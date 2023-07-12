@@ -47,40 +47,12 @@ apollo {
     }
 }
 
-openApiGenerate {
-    generatorName.set("java")
-    inputSpec.set("src/main/openapi/new_relic_v2.yml")
-    outputDir.set(project.layout.buildDirectory.file("generated/$name").map { it.asFile.absolutePath })
-  //  ignoreFileOverride.set(project.layout.projectDirectory.file(".openapi-generator-ignore").asFile.absolutePath)
-    cleanupOutput.set(true)
-    openapiNormalizer.set(mapOf("REF_AS_PARENT_IN_ALLOF" to "true"))
-    // see https://github.com/OpenAPITools/openapi-generator/blob/master/docs/generators/java.md for a description of each configuration option
-    generateApiTests.set(false)
-    configOptions.set(mapOf(
-        "library" to "apache-httpclient",
-        "dateLibrary" to "java8",
-        "hideGenerationTimestamp" to "true",
-        "openApiNullable" to "false",
-        "useBeanValidation" to "false",
-        "disallowAdditionalPropertiesIfNotPresent" to "false",
-        "additionalModelTypeAnnotations" to  "@com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)",
-        "sourceFolder" to "",  // makes IDEs like IntelliJ more reliably interpret the class packages.
-        "containerDefaultToNull" to "true",
-
-    ))
-}
 
 tasks.test {
     useJUnitPlatform()
 }
 
-sourceSets {
-    main {
-        java {
-            srcDir(tasks.openApiGenerate)
-        }
-    }
-}
+
 
 jib {
     from {
