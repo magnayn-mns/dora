@@ -4,6 +4,7 @@ plugins {
     id("com.apollographql.apollo3") version "3.8.2"
     id("org.openapi.generator") version "6.6.0"
     id("com.google.cloud.tools.jib") version "3.3.2"
+    kotlin("plugin.serialization") version "1.8.21"
 }
 
 val kotlinVersion: String by extra("1.8.21")
@@ -14,6 +15,7 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+    maven("https://packages.atlassian.com/mvn/maven-atlassian-external/")
 }
 
 dependencies {
@@ -22,6 +24,10 @@ dependencies {
     implementation("com.apollographql.apollo3:apollo-rx3-support:3.8.2")
     implementation("com.apollographql.apollo3:apollo-api:3.8.2")
 
+    implementation("io.opentelemetry:opentelemetry-exporter-otlp:1.28.0")
+    implementation("io.opentelemetry:opentelemetry-sdk:1.28.0")
+
+    implementation("io.opentelemetry:opentelemetry-semconv:1.28.0-alpha")
 
     implementation("com.newrelic.telemetry:telemetry-core:0.15.0")
     implementation("com.newrelic.telemetry:telemetry-http-okhttp:0.15.0")
@@ -33,6 +39,14 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2")
     implementation("com.google.code.findbugs:jsr305:3.0.2")
     implementation("org.apache.httpcomponents.client5:httpclient5:5.2.1")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+    // define a BOM and its version
+    implementation(platform("com.squareup.okhttp3:okhttp-bom:4.10.0"))
+
+    // define any required OkHttp artifacts without version
+    implementation("com.squareup.okhttp3:okhttp")
+    implementation("com.squareup.okhttp3:logging-interceptor")
 
     testCompileOnly("junit:junit:4.11")
     compileOnly("junit:junit:4.11")

@@ -9,6 +9,7 @@ fragment PullRequest on PullRequest {
   id
   number
   title
+  isDraft
   author {
     login
   }
@@ -23,6 +24,62 @@ fragment PullRequest on PullRequest {
   }
 }
 
+fragment TimelineData on PullRequestTimelineItems {
+  __typename
+  ... on PullRequestCommit {
+    id
+    commit {
+      committedDate
+    }
+  }
+  ... on ConvertToDraftEvent {
+    createdAt
+  }
+  ... on ReadyForReviewEvent {
+    createdAt
+  }
+  ... on LabeledEvent {
+    createdAt
+    actor {
+      login
+    }
+    label {
+      id
+      name
+    }
+  }
+  ... on IssueComment {
+    createdAt
+    author { login }
+    body
+  }
+  ... on PullRequestCommit {
+
+    commit { message }
+  }
+  ... on ReadyForReviewEvent {
+    createdAt
+    actor {login }
+  }
+  ... on ReviewRequestedEvent {
+    createdAt
+    actor{ login }
+
+  }
+  ... on PullRequestReview {
+    createdAt
+    body
+    state
+  }
+  ... on AddedToMergeQueueEvent {
+    createdAt
+    enqueuer {
+      id
+      login
+    }
+  }
+}
+
 query getLabelledPrs($repo: String!, $numLastPRs: Int!, $labelName: String!) {
   repository(name: $repo, owner: "DigitalInnovation") {
     label(name: $labelName) {
@@ -31,6 +88,121 @@ query getLabelledPrs($repo: String!, $numLastPRs: Int!, $labelName: String!) {
         __typename
         nodes {
           ...PullRequest
+        }
+      }
+    }
+  }
+}
+
+query getAllPullRequests($repo: String!, $numLastPRs: Int!, $cursor: String) {
+  repository(name: $repo, owner: "DigitalInnovation") {
+
+      pullRequests(last: $numLastPRs, before: $cursor, states: [MERGED]) {
+        __typename
+        nodes {
+          ...PullRequest
+        }
+
+        pageInfo {
+          hasNextPage
+          startCursor
+          endCursor
+        }
+      }
+
+  }
+}
+
+query getOpenPullRequests($repo: String!, $numLastPRs: Int!, $cursor: String) {
+  repository(name: $repo, owner: "DigitalInnovation") {
+
+    pullRequests(last: $numLastPRs, before: $cursor, states: [OPEN]) {
+      __typename
+      nodes {
+        ...PullRequest
+      }
+
+      pageInfo {
+        hasNextPage
+        startCursor
+        endCursor
+      }
+    }
+
+  }
+}
+
+
+query getPRDetails($repo: String!, $number: Int!) {
+
+  repository(name: $repo, owner: "DigitalInnovation") {
+
+    pullRequest(number:$number){
+      __typename
+      id
+      number
+      title
+      author {
+        login
+      }
+      mergedAt
+      createdAt
+      isDraft
+      state
+      additions,
+      deletions,
+      changedFiles,
+      commits(first: 100) {
+        edges {
+          node {
+            ...PullRequestCommit
+          }
+        }
+      }
+      files(first: 100) {
+
+        nodes {
+          path
+          additions,
+          deletions
+        }
+
+      }
+      closingIssuesReferences(first: 100) {
+        edges {
+          node {
+            id
+          }
+        }
+      },
+      timelineItems(first:100,
+        itemTypes: [PULL_REQUEST_COMMIT,READY_FOR_REVIEW_EVENT,LABELED_EVENT,ISSUE_COMMENT,PULL_REQUEST_COMMIT,READY_FOR_REVIEW_EVENT,REVIEW_REQUESTED_EVENT,PULL_REQUEST_REVIEW,ADDED_TO_MERGE_QUEUE_EVENT,CONVERT_TO_DRAFT_EVENT]) {
+        nodes {
+          ...TimelineData
+        }
+        pageInfo {
+          hasNextPage
+          startCursor
+          endCursor
+        }
+      }
+    }
+  }
+}
+
+query getPRTimeline($repo: String!, $number: Int!, $cursor: String) {
+
+  repository(name: $repo, owner: "DigitalInnovation") {
+
+    pullRequest(number:$number){
+      timelineItems(first:100, after: $cursor) {
+        nodes {
+          ...TimelineData
+        }
+        pageInfo {
+          hasNextPage
+          startCursor
+          endCursor
         }
       }
     }
