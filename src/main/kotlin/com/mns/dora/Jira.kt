@@ -146,7 +146,19 @@ class JiraFactory(val jSessionId:String) {
         }
     }
 
-
-
-
 }
+
+fun ticketIdFromString(title: String?): String? {
+    if( title?.startsWith("#")?:true)
+        return null;
+
+    var regex = "[a-z]+-[0-9]+".toRegex(RegexOption.IGNORE_CASE);
+    return regex.find(title ?: "")?.value?.uppercase()
+}
+
+fun teamIdFromTicketId(ticketId: String): String {
+    var regex = "[A-Z]+".toRegex(RegexOption.IGNORE_CASE);
+    return regex.find(ticketId)?.value?.uppercase() ?: "none"
+}
+
+
