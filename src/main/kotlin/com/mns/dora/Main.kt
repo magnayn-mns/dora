@@ -10,9 +10,9 @@ import java.time.Duration
 import java.time.Instant
 import java.util.*
 
-val PROJECT = "customer-order"
-val JSESSIONID = "4C86F19C6D4159E458F58B6AA83EAF76"
-val JIRA_PROJECT = "HPDLP"
+val PROJECT = "onyx"
+val JSESSIONID = "77104B33BF286265845948B4B039FAA3"
+val JIRA_PROJECT = "CFTO23"
 
 val otel = sdk()
 val tracer = otel.getTracer("io.opentelemetry.example")
@@ -26,15 +26,15 @@ suspend fun main(vararg args: String) = coroutineScope {
 suspend fun go_jira() {
     val ds:DataScrobbler = DataScrobbler(PROJECT, JSESSIONID )
 
-    ds.jira.getTicket("HPDLP-2600")
+   // ds.jira.getTicket("SHOPBE-329")
 
-    for(i in 2695 downTo 1 ){
+    for(i in 240 downTo 1 ){
         println(i)
-        ds.jira.getTicket("HPDLP-" + i)
+        ds.jira.getTicket("${JIRA_PROJECT}-" + i)
     }
 
 
-    dumpJIRAData(ds, "hpdlp_jira.csv")
+    dumpJIRAData(ds, "${JIRA_PROJECT}.csv")
 }
 
 fun dump(ticket:JiraTicket) {
@@ -76,11 +76,19 @@ fun dumpJIRAData(ds:DataScrobbler, fileName: String) {
     val formatter = SimpleDateFormat("yyyy-MM-dd")
     File(fileName).printWriter().use { out ->
 
-        out.println("Key,Title,Created,Status,Story Points,Story Points at Start,Started,Done,Duration")
+        out.print("Key,Title,Created,Status,Story Points,Story Points at Start,Started,Done")
+
+        val states = ds.jira.seenStates
+        states.forEach{
+            out.print(",")
+            out.print(it)
+        }
+        out.println(",Duration")
+
         tickets.forEach {
             println("Process " + it.key)
-            val started = it.statusChanges.find { it.to == "In development" }?.timestamp
-            val done = it.statusChanges.find { it.to == "Done" }?.timestamp
+            val started = it.statusChanges.find { it.to == "In development" || it.to.equals("In Progress", true) }?.timestamp
+            val done = it.statusChanges.findLast { it.to == "Done" }?.timestamp
 
             out.print(it.key + ",")
             out.print(it.title.replace(",","-") + ",")
@@ -103,6 +111,14 @@ fun dumpJIRAData(ds:DataScrobbler, fileName: String) {
             }
             else
             {
+                out.print(",")
+            }
+
+            val m = it.durationInStates
+            states.forEach{
+
+                if( m[it] != null )
+                    out.print(m[it]?.toFractionalHours())
                 out.print(",")
             }
 

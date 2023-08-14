@@ -4,6 +4,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.json.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.time.Duration
 
 import java.time.Instant
 import java.time.OffsetDateTime
@@ -11,6 +12,8 @@ import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
 import java.util.*
 import kotlin.Exception
+import kotlin.collections.HashMap
+
 
 val dtf = DateTimeFormatterBuilder()
     .append(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
@@ -52,6 +55,43 @@ class JiraTicket(val key: String, val jsonObject: JsonObject) {
 
         items.sortBy { it.timestamp}
         return items
+    }
+
+    val durationInStates:Map<String, Duration> get() {
+        val results = HashMap<String,Duration>()
+
+        var clock:Instant = created
+        var last:String? = null
+
+        statusChanges.forEach {
+
+            val now:Instant = it.timestamp
+            val duration = Duration.between(clock, now)
+
+            if( results.containsKey(it.from) ) {
+                results.put(it.from, results.get(it.from)!!.plus(duration))
+            } else {
+                results.put(it.from,duration)
+            }
+            last = it.to
+            clock=now
+        }
+
+        if( last != null ) {
+            val duration = Duration.between(clock, Instant.now())
+            if( results.containsKey(last) ) {
+                results.put(last!!, results.get(last)!!.plus(duration))
+            } else {
+                results.put(last!!,duration)
+            }
+        }
+
+        // If we got zero results, it's never transitioned
+        if(results.isEmpty()) {
+            results.put(status, Duration.between(created, Instant.now()))
+        }
+
+        return results
     }
 
     val statusChanges:List<StatusChange> get() {
@@ -111,6 +151,19 @@ class JiraTicket(val key: String, val jsonObject: JsonObject) {
 class JiraFactory(val jSessionId:String) {
 
     val tickets = HashMap<String, JiraTicket>()
+
+    val seenStates:Set<String> get() {
+        // Cheesy
+        val states = HashSet<String>()
+        tickets.values.forEach{
+            it.statusChanges.forEach {
+                states.add(it.from)
+                states.add(it.to)
+            }
+        }
+        return states
+    }
+
     fun getTicket(key: String):JiraTicket? {
 
         if( tickets.containsKey(key))
