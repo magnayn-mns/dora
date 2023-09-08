@@ -31,8 +31,6 @@ import kotlin.collections.ArrayList
 
 class PRData(val number: Int, val repo: String) {
 
-
-
     private var pr_details: com.github.GetPRDetailsQuery.PullRequest? = null
 
     suspend fun init(apolloClient: ApolloClient) {
@@ -162,14 +160,14 @@ class Github {
     val apolloClient: ApolloClient
     val repo:String
 
-    constructor(repo:String = "onyx") {
+    constructor(repo:String = "onyx", token:String) {
         this.repo = repo
 
         apolloClient = ApolloClient.Builder()
             .serverUrl("https://api.github.com/graphql")
             .addHttpHeader(
                 "Authorization",
-                "Bearer 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"
+                "Bearer ${token}"
             ) // .networkTransport(QueueTestNetworkTransport())
             .build()
     }

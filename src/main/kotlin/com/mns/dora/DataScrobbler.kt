@@ -6,14 +6,18 @@ class DataScrobbler {
 
 
     val github:Github
-    val jira:JiraFactory
+    val jira:JiraFactory?
 
     // Keyed on ID
     val workItems = HashMap<String, WorkItem>()
 
-    constructor(repoName: String, jiraSessionId:String) {
-        jira = JiraFactory(jiraSessionId)
-        github = Github(repoName)
+    constructor(repoName: String, jiraSessionId:String?, githubToken:String) {
+        if( jiraSessionId != null )
+            jira = JiraFactory(jiraSessionId);
+        else
+            jira = null;
+
+        github = Github(repoName, githubToken)
     }
 
     val timelines: List<TimelineItem>
@@ -51,7 +55,7 @@ class DataScrobbler {
         val workItem = WorkItem(ticketId)
         workItems[ticketId] = workItem
 
-        if( !ticketId.startsWith("#"))
+        if( !ticketId.startsWith("#") && jira != null )
             workItem.jiraTicket = jira.getTicket(ticketId)
         return workItem
     }

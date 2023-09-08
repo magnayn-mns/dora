@@ -104,10 +104,13 @@ fun convertPRtoTimeline(pr: PRData): TimelineParent {
         pr_ready_review = pr.createdAt
     }
 
-    val lttc_old = Timeline("Commit_to_merge", pr.firstCommitDate, pr.mergedAt)
-    lttc_old.attributes["type"] = "1ST_COMMIT_TO_MERGE"
-    full.add(lttc_old)
-
+    try {
+        val lttc_old = Timeline("Commit_to_merge", pr.firstCommitDate, pr.mergedAt)
+        lttc_old.attributes["type"] = "1ST_COMMIT_TO_MERGE"
+        full.add(lttc_old)
+    } catch(e:Exception) {
+        println("Date error on pr ${pr.number}");
+    }
     if( pr.mergedAt != null ) {
         prSpan.attributes.put("lttc_pr", Duration.between(pr.createdAt, pr.mergedAt))
         prSpan.attributes.put("lttc_old", Duration.between(pr.firstCommitDate, pr.mergedAt))

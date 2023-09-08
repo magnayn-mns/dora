@@ -10,27 +10,35 @@ import java.time.Duration
 import java.time.Instant
 import java.util.*
 
-val PROJECT = "onyx"
-val JSESSIONID = "77104B33BF286265845948B4B039FAA3"
-val JIRA_PROJECT = "CFTO23"
+val PROJECT = "pim-kafka-connector"
+val JSESSIONID = null // don't fetch from JIRA
+val JIRA_PROJECT = "PRICE"
+val GH_TOKEN = "<<TOKEN>>"
 
 val otel = sdk()
 val tracer = otel.getTracer("io.opentelemetry.example")
 
 suspend fun main(vararg args: String) = coroutineScope {
-  //  go_active() // Active Items
- //   go_historical()
-    go_jira()
+  try {
+
+      //  go_active() // Active Items
+      go_historical()
+//    go_jira()
+  } catch(ex:Exception) {
+      ex.printStackTrace();
+
+  }
+    println("Done.");
 }
 
 suspend fun go_jira() {
-    val ds:DataScrobbler = DataScrobbler(PROJECT, JSESSIONID )
+    val ds:DataScrobbler = DataScrobbler(PROJECT, JSESSIONID, GH_TOKEN )
 
    // ds.jira.getTicket("SHOPBE-329")
 
     for(i in 240 downTo 1 ){
         println(i)
-        ds.jira.getTicket("${JIRA_PROJECT}-" + i)
+        ds.jira?.getTicket("${JIRA_PROJECT}-" + i)
     }
 
 
@@ -58,7 +66,7 @@ fun dump(ticket:JiraTicket) {
 
 suspend fun go_active() {
 
-    val ds:DataScrobbler = DataScrobbler(PROJECT, JSESSIONID )
+    val ds:DataScrobbler = DataScrobbler(PROJECT, JSESSIONID, GH_TOKEN )
     ds.initialiseWithOpenPulls(1000)
     //ds.processPullRequest(537)
     dumpActivePRs(ds, "price_active_lttc.csv")
@@ -72,6 +80,9 @@ fun Duration.toFractionalHours():String {
 
 
 fun dumpJIRAData(ds:DataScrobbler, fileName: String) {
+    if( ds.jira == null )
+        return;
+
     val tickets = ds.jira.tickets.values
     val formatter = SimpleDateFormat("yyyy-MM-dd")
     File(fileName).printWriter().use { out ->
@@ -137,10 +148,12 @@ fun dumpJIRAData(ds:DataScrobbler, fileName: String) {
 
 suspend fun go_historical() {
 
-    val ds:DataScrobbler = DataScrobbler(PROJECT, JSESSIONID )
-    ds.initialiseWithMergedPRs(2000)
 
-    dumpMergedPRs(ds, "co_merged_lttc.csv")
+    val ds:DataScrobbler = DataScrobbler(PROJECT, JSESSIONID, GH_TOKEN )
+    ds.initialiseWithMergedPRs(2000)
+    var now = Date();
+    val formatter = SimpleDateFormat("MMMdd")
+    dumpMergedPRs(ds, "${formatter.format(now)}--${PROJECT}_merged_lttc.csv")
     dumpInfo(ds)
 }
 
@@ -163,7 +176,7 @@ fun dumpActivePRs(ds:DataScrobbler, fileName: String) {
 
         out.println("PR,Author,Created,TITLE,JIRA,LTTC,LTTC_PR,LTTC_OLD")
         ds.pullRequests()
-            .filter { !it.isDraft && !it.author.equals("renovate") && !it.author.equals("dependabot") }
+            .filter { !it.isDraft  } // && !it.author.equals("renovate") && !it.author.equals("dependabot") }
             .forEach {
             out.println(
                 "${it.number},${it.author},${formatter.format(Date.from(it.createdAt))},${
@@ -186,21 +199,14 @@ fun dumpMergedPRs(ds:DataScrobbler, fileName:String) {
         it.accept(visitor)
     }
 
-    /*
-    val otelVisitor = OtelVisitor(tracer)
-    timelines.forEach{
-        it.accept(otelVisitor)
-    }
-
-     */
 
     val formatter = SimpleDateFormat("yyyy-MM-dd")
 
     File(fileName).printWriter().use { out ->
 
-        out.println("PR, Author,Created,Merged,TITLE,JIRA,LTTC,LTTC_PR,LTTC_OLD")
+        out.println("PR,Author,Created,Merged,TITLE,JIRA,LTTC,LTTC_PR,LTTC_OLD")
         ds.pullRequests()
-            .filter { !it.isDraft && !it.author.equals("renovate")&& !it.author.equals("dependabot")}
+            .filter { !it.isDraft } //&& !it.author.equals("renovate")&& !it.author.equals("dependabot")}
             .forEach {
             out.println(
                 "${it.number},${it.author},${formatter.format(Date.from(it.createdAt))},${
