@@ -1,18 +1,14 @@
 package com.mns.dora
 
-import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.json.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.time.Duration
-
 import java.time.Instant
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
 import java.util.*
-import kotlin.Exception
-import kotlin.collections.HashMap
 
 
 val dtf = DateTimeFormatterBuilder()
@@ -199,6 +195,22 @@ class JiraFactory(val jSessionId:String) {
         }
     }
 
+    fun getTickets(project: String, low: Int, high: Int):List<JiraTicket> {
+
+        var l = ArrayList<JiraTicket>();
+
+        for( i in low..high ) {
+            try {
+                var t = getTicket("${project}-${i}");
+                if( t != null ) {
+                    l.add(t)
+                }
+            } catch(e:Exception) {
+                println("Skipped Ticket ${project}-${i}")
+            }
+        }
+        return l;
+    }
 }
 
 fun ticketIdFromString(title: String?): String? {

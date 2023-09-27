@@ -1,13 +1,9 @@
 package com.mns.dora
 
-import io.opentelemetry.api.trace.Span
-import io.opentelemetry.api.trace.Tracer
-import io.opentelemetry.context.Scope
 import kotlinx.coroutines.coroutineScope
 import java.io.File
 import java.text.SimpleDateFormat
 import java.time.Duration
-import java.time.Instant
 import java.util.*
 
 val PROJECT = "pim-kafka-connector"
@@ -15,21 +11,40 @@ val JSESSIONID = null // don't fetch from JIRA
 val JIRA_PROJECT = "PRICE"
 val GH_TOKEN = "<<TOKEN>>"
 
-val otel = sdk()
-val tracer = otel.getTracer("io.opentelemetry.example")
+//val otel = sdk()
+//val tracer = otel.getTracer("io.opentelemetry.example")
 
 suspend fun main(vararg args: String) = coroutineScope {
   try {
 
       //  go_active() // Active Items
-      go_historical()
-//    go_jira()
+     // go_historical()
+    go_jira()
+
+//      go_analytics()
+
   } catch(ex:Exception) {
       ex.printStackTrace();
 
   }
     println("Done.");
 }
+
+
+suspend fun go_analytics() {
+    val ds:DataScrobbler = DataScrobbler(PROJECT, JSESSIONID, GH_TOKEN )
+
+    // Get all the merged data
+    ds.initialiseWithMergedPRs(15000)
+
+    // get the JIRA tickets
+   // ds.jira?.getTickets("HPDLP", 1, 3000)
+   // ds.jira?.getTickets("NAV", 1, 2100)
+
+
+
+}
+
 
 suspend fun go_jira() {
     val ds:DataScrobbler = DataScrobbler(PROJECT, JSESSIONID, GH_TOKEN )
@@ -141,6 +156,14 @@ fun dumpJIRAData(ds:DataScrobbler, fileName: String) {
             }
             out.println("")
 
+
+            /// End
+            if( started != null && done != null ) {
+                val dur = Duration.between(started, done)
+                out.print(dur.toFractionalHours())
+            }
+            out.println("")
+
         }
     }
 
@@ -226,6 +249,11 @@ fun dumpMergedPRs(ds:DataScrobbler, fileName:String) {
     }
 
 }
+
+
+
+
+
 
 
 

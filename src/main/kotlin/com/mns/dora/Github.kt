@@ -4,29 +4,9 @@ import com.apollographql.apollo3.ApolloClient
 import com.github.GetAllPullRequestsQuery
 import com.github.GetOpenPullRequestsQuery
 import com.github.GetPRDetailsQuery
-import com.github.GetTeamMembersQuery
 import com.github.fragment.PullRequest
-import com.newrelic.telemetry.Attributes
-import com.newrelic.telemetry.MetricBatchSenderFactory
-import com.newrelic.telemetry.OkHttpPoster
-import com.newrelic.telemetry.http.HttpPoster
-import com.newrelic.telemetry.metrics.Gauge
-import com.newrelic.telemetry.metrics.MetricBatchSender
-import com.newrelic.telemetry.metrics.MetricBuffer
-import io.opentelemetry.api.baggage.Baggage
-import io.opentelemetry.api.trace.Tracer
-import io.opentelemetry.context.Context
-
-import kotlinx.coroutines.coroutineScope
 import java.time.Duration
 import java.time.Instant
-import java.util.*
-import java.util.concurrent.TimeUnit
-import java.util.function.Supplier
-import kotlin.collections.ArrayList
-
-
-
 
 
 class PRData(val number: Int, val repo: String) {

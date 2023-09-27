@@ -1,7 +1,5 @@
 package com.mns.dora
 
-import java.util.ArrayList
-
 class WorkItem(val id:String) {
     var jiraTicket:JiraTicket? = null
     var pullRequests = ArrayList<PRData>()
@@ -20,10 +18,16 @@ class WorkItem(val id:String) {
             tlParent.add(tlJira)
         }
 
-        val prs = pullRequests.map{ convertPRtoTimeline(it) }
+        val prs = pullRequests.map{
+            try {
+                convertPRtoTimeline(it)
+            } catch(_:Exception) {
+                null
+            } }
 
         prs.forEach{
-            tlParent.add(it)
+           if( it != null )
+               tlParent.add(it)
         }
 
         return tlParent
