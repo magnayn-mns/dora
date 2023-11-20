@@ -16,10 +16,11 @@ val GH_TOKEN = "<<TOKEN>>"
 
 suspend fun main(vararg args: String) = coroutineScope {
   try {
+    PROJECT = args[0];
 
       //  go_active() // Active Items
-     // go_historical()
-    go_jira()
+     go_historical()
+    //go_jira()
 
 //      go_analytics()
 
@@ -176,7 +177,7 @@ suspend fun go_historical() {
     ds.initialiseWithMergedPRs(2000)
     var now = Date();
     val formatter = SimpleDateFormat("MMMdd")
-    dumpMergedPRs(ds, "${formatter.format(now)}--${PROJECT}_merged_lttc.csv")
+    dumpMergedPRs(ds, "${formatter.format(now)}/${PROJECT}_merged_lttc.csv")
     dumpInfo(ds)
 }
 
@@ -194,6 +195,8 @@ fun dumpInfo(ds:DataScrobbler) {
 
 fun dumpActivePRs(ds:DataScrobbler, fileName: String) {
     val formatter = SimpleDateFormat("yyyy-MM-dd")
+
+    File(fileName).parentFile.mkdirs();
 
     File(fileName).printWriter().use { out ->
 
@@ -213,7 +216,7 @@ fun dumpActivePRs(ds:DataScrobbler, fileName: String) {
     }
 }
 
-fun dumpMergedPRs(ds:DataScrobbler, fileName:String) {
+fun dumpMergedPRs(ds:DataScrobbler, `fileName`:String) {
     var timelines = ds.timelines
 
     val visitor = DumpVisitor() //OtelVisitor(tracer)
@@ -224,15 +227,21 @@ fun dumpMergedPRs(ds:DataScrobbler, fileName:String) {
 
 
     val formatter = SimpleDateFormat("yyyy-MM-dd")
+    File(fileName).parentFile.mkdirs()
 
     File(fileName).printWriter().use { out ->
 
-        out.println("PR,Author,Created,Merged,TITLE,JIRA,LTTC,LTTC_PR,LTTC_OLD")
+        out.println("PR,Author,Created,RFR,Merged,TITLE,JIRA,LTTC,LTTC_PR,LTTC_OLD")
         ds.pullRequests()
             .filter { !it.isDraft } //&& !it.author.equals("renovate")&& !it.author.equals("dependabot")}
             .forEach {
+                var dt = "";
+                var item = it.pr_ready_review?:it.createdAt;
+                if( item != null )
+                    dt = formatter.format(Date.from(item));
+
             out.println(
-                "${it.number},${it.author},${formatter.format(Date.from(it.createdAt))},${
+                "${it.number},${it.author},${formatter.format(Date.from(it.createdAt))},${dt},${
                     formatter.format(
                         Date.from(
                             it.mergedAt

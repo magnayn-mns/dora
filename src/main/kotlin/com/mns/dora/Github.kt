@@ -48,9 +48,11 @@ class PRData(val number: Int, val repo: String) {
             prSpan.attributes.put("lttc", Duration.between(pr_ready_review, Instant.now()))
   */
     val pr_ready_review:Instant? get() {
+        // TOOD: Drafts?
         return timelineItems.findLast {  it?.item?.timelineData?.onReadyForReviewEvent != null }
             ?.timeStamp
     }
+
     val lttc:Duration get() {
         return Duration.between(pr_ready_review?:createdAt, mergedAt?:Instant.now())
     }
