@@ -2,6 +2,7 @@ package com.mns.dora
 
 import com.apollographql.apollo3.ApolloClient
 import com.github.GetAllPullRequestsQuery
+import com.github.GetBranchesQuery
 import com.github.GetOpenPullRequestsQuery
 import com.github.GetPRDetailsQuery
 import com.github.fragment.PullRequest
@@ -137,6 +138,31 @@ class PrTimelineItem(public val item: GetPRDetailsQuery.Node3) {
 
 }
 
+class BranchInfo(val edge: GetBranchesQuery.Edge) {
+    val name get() = edge.node?.branchName ?: ""
+
+    val commitDate get() = edge.node?.target?.onCommit?.history?.edges?.get(0)?.node?.committedDate
+
+    val author get() = edge.node?.target?.onCommit?.history?.edges?.get(0)?.node?.author
+
+    val prStata:String
+        get() {
+       val st = edge.node?.associatedPullRequests?.edges;
+       return st?.map { it -> it?.node?.state?.name }?.joinToString(", ") ?: "";
+    }
+
+    val PRs:String
+        get() {
+            val st = edge.node?.associatedPullRequests?.edges;
+            return st?.map { it -> it?.node?.number }?.joinToString(", ") ?: "";
+        }
+
+    override fun toString(): String {
+        return "\"$name\",\"$commitDate\",\"$author\",\"$PRs\",\"$prStata\""
+    }
+
+
+}
 
 class Github {
     val apolloClient: ApolloClient
@@ -158,6 +184,33 @@ class Github {
         val prData = PRData(number, repo)
         prData.init(apolloClient)
         return prData
+    }
+
+    suspend fun getBranches(limit: Int = 500): ArrayList<BranchInfo> {
+        val list = ArrayList<BranchInfo>()
+        var cursor: String? = null
+        while (true) {
+
+            println("cursor ${cursor}")
+            var v: com.apollographql.apollo3.api.Optional<String?> = com.apollographql.apollo3.api.Optional.Absent
+            if (cursor != null)
+                v = com.apollographql.apollo3.api.Optional.Present(cursor)
+
+            var itemcount = limit
+            if( limit > 100)
+                itemcount = 100
+
+            var resp2 = apolloClient.query(GetBranchesQuery(repo, itemcount, cursor = v)).execute()
+
+            resp2.data?.repository?.refs?.edges?.forEach {
+                if( it?.node?.branchName != null )
+                    list.add(BranchInfo(it));
+            }
+
+            cursor = resp2.data?.repository?.refs?.pageInfo?.startCursor
+            if (cursor == null || list.size >= limit)
+                return list
+        }
     }
 
     suspend fun getOpenPullRequests(limit: Int = 300): ArrayList<PullRequest> {
@@ -213,6 +266,8 @@ class Github {
                 return list
         }
     }
+
+
 }
 /*
 class Processor {

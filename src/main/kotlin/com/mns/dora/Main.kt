@@ -1,6 +1,8 @@
 package com.mns.dora
 
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.text.SimpleDateFormat
 import java.time.Duration
@@ -19,7 +21,10 @@ suspend fun main(vararg args: String) = coroutineScope {
     PROJECT = args[0];
 
       //  go_active() // Active Items
-     go_historical()
+      runBlocking {
+         //go_historical()
+          go_unmerged_pr()
+     }
     //go_jira()
 
 //      go_analytics()
@@ -29,10 +34,29 @@ suspend fun main(vararg args: String) = coroutineScope {
 
   }
     println("Done.");
+    System.exit(0);
+}
+
+suspend fun go_unmerged_pr() {
+    val github = Github(PROJECT, GH_TOKEN)
+
+    github.getBranches().forEach {
+        println("${it}")
+    }
+
+    val unmergedPRs = github.getOpenPullRequests()
+    println("${unmergedPRs.size}")
+    unmergedPRs.forEach {
+     //   println("PR ${it.number}, ${it.baseRef?.name}, ${it.baseRef?.id}, ${it.headRef?.name}, ${it.headRef?.id} ")
+        println("  origin/${it.headRef?.name}")
+    }
+
+
 }
 
 
 suspend fun go_analytics() {
+
     val ds:DataScrobbler = DataScrobbler(PROJECT, JSESSIONID, GH_TOKEN )
 
     // Get all the merged data

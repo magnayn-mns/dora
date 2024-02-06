@@ -1,13 +1,18 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     id("java")
-    kotlin("jvm") version "1.8.21"
+    kotlin("jvm") version "1.9.20"
     id("com.apollographql.apollo3") version "3.8.2"
     id("org.openapi.generator") version "6.6.0"
     id("com.google.cloud.tools.jib") version "3.3.2"
     kotlin("plugin.serialization") version "1.8.21"
+
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
-val kotlinVersion: String by extra("1.8.21")
+val kotlinVersion: String by extra("1.9.20")
 val kotlinCoroutinesVersion: String by extra("1.7.0-RC")
 
 group = "org.example"
@@ -66,6 +71,16 @@ tasks.test {
     useJUnitPlatform()
 }
 
+tasks.withType<ShadowJar> {
+    archiveFileName.set("app.jar")
+
+    manifest.attributes.apply {
+
+
+        put("Main-Class", "com.mns.dora.MainKt")
+    }
+
+}
 
 
 jib {
@@ -101,4 +116,10 @@ jib {
     }
 
 
+}
+
+tasks {
+    build {
+        dependsOn(shadowJar)
+    }
 }

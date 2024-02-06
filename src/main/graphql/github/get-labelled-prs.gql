@@ -1,5 +1,6 @@
 fragment PullRequestCommit on PullRequestCommit {
   commit {
+
     committedDate
   }
 }
@@ -15,6 +16,14 @@ fragment PullRequest on PullRequest {
   }
   mergedAt
   createdAt
+  baseRef {
+    name
+    id
+  }
+  headRef {
+    name
+    id
+  }
   commits(first: 1) {
     edges {
       node {
@@ -189,6 +198,55 @@ query getPRDetails($repo: String!, $number: Int!) {
     }
   }
 }
+
+query getBranches($repo: String!, $number: Int!, $cursor: String) {
+
+  repository(name: $repo, owner: "DigitalInnovation") {
+    id
+    name
+    refs(refPrefix: "refs/heads/", first: $number, after: $cursor) {
+
+      edges {
+        node {
+
+          branchName:name
+          id
+          associatedPullRequests(first: 10) {
+            edges {
+              node
+              {
+                id
+                number
+                state
+              }
+            }
+
+          }
+          target {
+            ... on Commit {
+              history(first: 1) {
+                edges {
+                  node {
+                    committedDate
+                    author {
+                      name
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      pageInfo {
+        hasNextPage
+        startCursor
+        endCursor #use this value to paginate through repos with more than 100 branches
+      }
+    }
+  }
+}
+
 
 query getPRTimeline($repo: String!, $number: Int!, $cursor: String) {
 

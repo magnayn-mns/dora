@@ -35,3 +35,4 @@ query GetMergedPrs($last: Int!, $searchQuery: String!, $after: String) {
     }
   }
 }
+

@@ -76,4 +76,14 @@ class DataScrobbler {
             processPullRequest(it.number)
         }
     }
+
+    suspend fun initialiseWithUnmergedPRs() {
+        val unmergedPRs = github.getOpenPullRequests()
+
+        unmergedPRs.forEach {
+            println("PR ${it.number}")
+            processPullRequest(it.number)
+        }
+
+    }
 }
